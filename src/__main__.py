@@ -9,7 +9,7 @@ if __name__ == '__main__':
     automaton.add_word('apal')
     automaton.add_word('apalc')
     automaton.add_word('pda')
-    automaton.add_word('bpd')
+    automaton.add_word('bpde')
     automaton.add_word('bp')
     automaton.add_word('bzd')
     automaton.add_word('b')

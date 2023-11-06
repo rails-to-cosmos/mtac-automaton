@@ -15,8 +15,6 @@ class Node:
 
 
 class RootNode(Node):
-    depth: int = 0
-
     def pretty(self) -> list[str]:
         ROOT_SYMBOL = '*'
         TAB_SYMBOL = ' '
