@@ -1,3 +1,3 @@
 #!/bin/bash
 
-pipenv run python src/automaton.py
+pipenv run python -m src
