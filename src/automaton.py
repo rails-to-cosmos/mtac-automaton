@@ -16,21 +16,22 @@ class Automaton:
 
         for index, char in enumerate(normalized_word):
             is_last_node = index == depth - 1
+            max_depth = max(current_node.depth, depth)
 
             if char in current_node.children:
 
                 match current_node:
                     case IntermediateNode():
-                        current_node.depth = max(current_node.depth, depth)
+                        current_node.depth = max_depth
 
                 if is_last_node:
                     match current_node.children[char]:
                         case IntermediateNode() as im:
-                            current_node.children[char] = EndNode(char, max(im.depth, depth))
+                            current_node.children[char] = EndNode(char, max_depth)
                             current_node.children[char].children = im.children
 
                 current_node = current_node.children[char]
             else:
-                new_node: Node = EndNode(char, depth) if is_last_node else IntermediateNode(char, depth)
+                new_node: Node = EndNode(char, max_depth) if is_last_node else IntermediateNode(char, max_depth)
                 current_node.children[char] = new_node
                 current_node = new_node
