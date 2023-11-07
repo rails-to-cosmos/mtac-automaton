@@ -21,3 +21,17 @@ def test_automaton_factors():
     automaton.add_word('axpaj')
     automaton.add_word('apxaj')
     assert automaton.root['a']['a']['p']['x']['j'].factor == 2
+
+# TODO Test multiple occs
+
+
+def test_definition():
+    automaton = Automaton()
+
+    automaton.add_word('axpaj')
+    automaton.add_word('apxaj')
+    automaton.add_word('dnrbt')
+    automaton.add_word('pjxdn')
+    automaton.add_word('abd')
+
+    assert automaton.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt') == 4

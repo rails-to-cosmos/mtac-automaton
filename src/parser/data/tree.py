@@ -1,34 +1,39 @@
 from __future__ import annotations
 
 import math
-import dataclasses as dc
+import dataclasses
 from typing import Optional
 
 from parser.utils.text import normalize_word
 
-@dc.dataclass
-class Node:
-    value: str = dc.field(default='')
-    depth: int = dc.field(default=0)
-    children: dict[str, InterimNode | EndNode] = dc.field(default_factory=dict)
 
-    def __getitem__(self, key: str) -> Optional[Node]:
+# TODO: consider frozen nodes
+@dataclasses.dataclass
+class Node:
+    value: str = dataclasses.field(default='')
+    depth: int = dataclasses.field(default=0)
+    children: dict[str, InterimNode | EndNode] = dataclasses.field(default_factory=dict)
+
+    def __getitem__(self, key: str) -> InterimNode | EndNode | None:
         return self.children.get(key)
 
+    def __contains__(self, key: str) -> bool:
+        return key in self.children
 
-@dc.dataclass
+
+@dataclasses.dataclass
 class RootNode(Node):
     ...
 
 
-@dc.dataclass
+@dataclasses.dataclass
 class InterimNode(Node):
     ...
 
 
-@dc.dataclass
+@dataclasses.dataclass
 class EndNode(Node):
-    factor: int = dc.field(default=1)
+    factor: int = dataclasses.field(default=1)
 
 
 def pretty(root: RootNode) -> str:
