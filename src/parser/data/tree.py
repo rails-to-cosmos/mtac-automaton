@@ -35,7 +35,7 @@ def pretty(root: RootNode) -> str:
     # some constants for pretty printing tree structures
     ROOT_SYMBOL = '*'
     TAB_SYMBOL = ' '
-    TOKEN_LEN = 6
+    TOKEN_LEN = 11
 
     result = [ROOT_SYMBOL]
     prev_depth = math.inf
@@ -52,9 +52,9 @@ def pretty(root: RootNode) -> str:
 
         match node:
             case EndNode():
-                result.append(node.value + '!' + f'({node.depth})')
+                result.append('- ' + node.value + ' ' + f'({node.depth}, {node.factor})')
             case InterimNode():
-                result.append(node.value + ' ' + f'({node.depth})')
+                result.append('- ' + node.value + ' ' + f'({node.depth}, 0)')
 
         for child in node.children.values():
             stack.append((depth + TOKEN_LEN, child))
