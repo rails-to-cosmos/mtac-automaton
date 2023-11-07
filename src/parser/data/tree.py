@@ -1,58 +1,62 @@
 from __future__ import annotations
 
 import math
-from typing import *
-from dataclasses import dataclass
+import dataclasses as dc
+from typing import Optional
 
 from parser.utils.text import normalize_word
 
-
+@dc.dataclass
 class Node:
-    children: dict[str, IntermediateNode]
+    value: str = dc.field(default='')
+    depth: int = dc.field(default=0)
+    children: dict[str, InterimNode | EndNode] = dc.field(default_factory=dict)
 
-    def __init__(self) -> None:
-        self.children = dict()
+    def __getitem__(self, key: str) -> Optional[Node]:
+        return self.children.get(key)
 
 
+@dc.dataclass
 class RootNode(Node):
-    def pretty(self) -> list[str]:
-        ROOT_SYMBOL = '*'
-        TAB_SYMBOL = ' '
-        TOKEN_LEN = 6
-
-        result = [ROOT_SYMBOL]
-        prev_depth = math.inf
-
-        stack = [(1, child) for child in self.children.values()]
-
-        while stack:
-            depth, node = stack.pop()
-
-            if prev_depth >= depth:
-                result.append('\n' + TAB_SYMBOL * depth)
-
-            prev_depth = depth
-            match node:
-                case EndNode():
-                    result.append(node.value + '!' + f'({node.depth})')
-                case _:
-                    result.append(node.value + ' ' + f'({node.depth})')
-
-            for child in node.children.values():
-                stack.append((depth + TOKEN_LEN, child))
-
-        return result
-
-
-class IntermediateNode(Node):
-    value: str
-    depth: int
-
-    def __init__(self, value: str, depth: int) -> None:
-        super().__init__()
-        self.value = value
-        self.depth = depth
-
-
-class EndNode(IntermediateNode):
     ...
+
+
+@dc.dataclass
+class InterimNode(Node):
+    ...
+
+
+@dc.dataclass
+class EndNode(Node):
+    factor: int = dc.field(default=1)
+
+
+def pretty(root: RootNode) -> str:
+    # some constants for pretty printing tree structures
+    ROOT_SYMBOL = '*'
+    TAB_SYMBOL = ' '
+    TOKEN_LEN = 6
+
+    result = [ROOT_SYMBOL]
+    prev_depth = math.inf
+
+    stack = [(1, child) for child in root.children.values()]
+
+    while stack:
+        depth, node = stack.pop()
+
+        if prev_depth >= depth:
+            result.append('\n' + TAB_SYMBOL * depth)
+
+        prev_depth = depth
+
+        match node:
+            case EndNode():
+                result.append(node.value + '!' + f'({node.depth})')
+            case InterimNode():
+                result.append(node.value + ' ' + f'({node.depth})')
+
+        for child in node.children.values():
+            stack.append((depth + TOKEN_LEN, child))
+
+    return ' '.join(result)

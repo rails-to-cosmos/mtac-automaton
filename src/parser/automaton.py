@@ -1,4 +1,4 @@
-from parser.data.tree import RootNode, EndNode, IntermediateNode, Node
+from parser.data.tree import RootNode, EndNode, InterimNode, Node
 from parser.utils.text import normalize_word
 
 
@@ -8,12 +8,20 @@ class Automaton:
     def __init__(self) -> None:
         self.root = RootNode()
 
-    def add_word(self, word: str) -> None:
-        normalized_word = normalize_word(word)  # compaction
+    def validate_input(self, s: str) -> None:
+        ...
 
-        current_node: Node = self.root
+    def validate_dictionary(self, s: str) -> None:
+        ...
+
+    def scan(self, _input: str) -> int:
+        return 0
+
+    def add_word(self, word: str) -> None:
+        normalized_word = normalize_word(word)
         depth = len(normalized_word)
 
+        current_node: Node = self.root
         for index, char in enumerate(normalized_word):
             is_last_node = index == depth - 1
 
@@ -22,23 +30,39 @@ class Automaton:
 
                 if is_last_node:
                     match current_node.children[char]:
-                        case IntermediateNode() as im:
-                            current_node.children[char] = EndNode(char, max_depth)
-                            current_node.children[char].children = im.children
+                        case EndNode() as end_node:
+                            current_node.children[char] = EndNode(
+                                children=end_node.children,
+                                value=char,
+                                depth=max_depth,
+                                factor=end_node.factor + 1,
+                            )
+                        case InterimNode() as im:
+                            current_node.children[char] = EndNode(
+                                children=im.children,
+                                value=char,
+                                depth=max_depth,
+                                factor=1,
+                            )
 
                 match current_node:
-                    case IntermediateNode() as im:
+                    case RootNode():
+                        ...
+                    case _:
                         current_node.depth = max_depth
 
                 current_node = current_node.children[char]
                 current_node.depth = max_depth
             else:
                 match current_node:
-                    case IntermediateNode() as im:
-                        max_depth = max(im.depth, depth)
-                    case _:
+                    case RootNode():
                         max_depth = depth
+                    case node:
+                        max_depth = max(node.depth, depth)
 
-                new_node: IntermediateNode = EndNode(char, max_depth) if is_last_node else IntermediateNode(char, max_depth)
+                new_node: InterimNode | EndNode = EndNode(value=char, depth=max_depth, factor=1) \
+                    if is_last_node \
+                       else InterimNode(value=char, depth=max_depth)
+
                 current_node.children[char] = new_node
                 current_node = new_node
