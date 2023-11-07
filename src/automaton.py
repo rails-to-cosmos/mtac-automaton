@@ -39,6 +39,6 @@ class Automaton:
                     case _:
                         max_depth = depth
 
-                new_node: Node = EndNode(char, max_depth) if is_last_node else IntermediateNode(char, max_depth)
+                new_node: IntermediateNode = EndNode(char, max_depth) if is_last_node else IntermediateNode(char, max_depth)
                 current_node.children[char] = new_node
                 current_node = new_node
