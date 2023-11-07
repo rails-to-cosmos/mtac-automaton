@@ -8,6 +8,7 @@ treelib = "*"
 mypy = "*"
 pdbpp = "*"
 pytest = "*"
+pylint = "*"
 
 [dev-packages]
 

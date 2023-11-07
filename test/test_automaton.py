@@ -14,7 +14,7 @@ from parser.automaton import Automaton
 #     automaton.add_word('bzd')
 #     automaton.add_word('b')
 
-#     print(' '.join(automaton.root.pretty()))
+#     print(' '.join(automaton.root.prettify()))
 
 def test_automaton_factors():
     automaton = Automaton()
@@ -34,4 +34,23 @@ def test_definition():
     automaton.add_word('pjxdn')
     automaton.add_word('abd')
 
+    print(automaton.root.prettify())
     assert automaton.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt') == 4
+
+def test_finish_on_carry():
+    automaton = Automaton()
+
+    automaton.add_word('abeaz')
+    automaton.add_word('abfy')
+
+    print(automaton.root.prettify())
+    assert automaton.scan('abeaz') == 1
+
+# def test_finish_on_carry_2():
+#     automaton = Automaton()
+
+#     automaton.add_word('abeaz')
+#     automaton.add_word('abfy')
+
+#     print(automaton.root.prettify())
+#     assert automaton.scan('abyf') == 1

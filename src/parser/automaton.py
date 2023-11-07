@@ -1,43 +1,10 @@
-from typing import List
-from typing import Dict
-
-import logging
-import dataclasses
 import copy
 
-from collections import deque
-from dataclasses import dataclass, field
+from typing import List
 
+from parser.data.mutable_state import MutableState
 from parser.data.tree import RootNode, EndNode, InterimNode, Node
 from parser.utils.text import normalize_word
-
-
-@dataclass
-class State:
-    node: InterimNode | EndNode
-    carry_queue: deque = field(default_factory=deque)  # lookups can be optimized with set
-    carry_index: Dict[str, int] = field(default_factory=dict)
-
-    def remember(self, item: str) -> None:
-        self.adjust()
-        self.carry_queue.append(item)
-        if item not in self.carry_index:
-            self.carry_index[item] = 0
-        self.carry_index[item] += 1
-
-    def adjust(self) -> None:
-        while len(self.carry_queue) >= self.node.depth:
-            item, *_ = self.carry_queue
-            self.remove(item)
-
-    def remove(self, item: str) -> None:
-        self.carry_queue.remove(item)
-        self.carry_index[item] -= 1
-        if self.carry_index[item] == 0:
-            del self.carry_index[item]
-
-    def __repr__(self) -> str:
-        return f'State({self.node.value}, {self.carry_queue})'
 
 
 class Automaton:
@@ -51,63 +18,72 @@ class Automaton:
         ...
 
     def scan(self, text: str) -> int:
-        print(f'Scan "{text}"')
+        print(f'Scan: "{text}"')
 
         result = 0
 
-        active_states: List[State] = []
-        next_states: List[State] = []
+        current_states: List[MutableState] = []
+        next_states: List[MutableState] = []
 
         for char in text:
+            while current_states:
+                print(current_states)
 
-            while active_states:
-                state = active_states.pop()
+                current_state = current_states.pop()
 
-                if char not in state.node:
-                    state.remember(char)
-                    next_states.append(state)
-                    continue
-
-                match state.node[char]:
-                    case EndNode(depth=depth, factor=factor) as end_node:  # Word found!
+                match current_state.node[char]:
+                    case EndNode(factor=factor) as end_node:  # Word found!
                         result += factor
-                        print(f'State transition: {state.node.value} -> {end_node.value} (carry: {state.carry_queue})')
-                        state.node = end_node
+                        print(f'+{factor} ET: {current_state.node.value} -> {end_node.value} (carry: {list(current_state.carry_queue)})')
+                        print(self.root.prettify())
                         end_node.factor = 0  # TODO Update node type / write it to (seen) / remove all factor 0
-                    case InterimNode() as im_node:
-                        print(f'State transition: {state.node.value} -> {im_node.value} (carry: {state.carry_queue})')
-                        state.node = im_node
 
-                carry_states = [state]
-                while carry_states:
-                    carry_state = carry_states.pop()
+                        next_state = MutableState(
+                            node=end_node,
+                            carry_queue=copy.copy(current_state.carry_queue),
+                            carry_index=copy.copy(current_state.carry_index),
+                        )
 
-                    trans = False
-                    for child in carry_state.node.children.values():
-                        if child.value in state.carry_index:
-                            new_state = State(
-                                node=child,
-                                carry_queue=copy.copy(state.carry_queue),
-                                carry_index=copy.copy(state.carry_index),
-                            )
+                        next_states.append(next_state)
+                    case InterimNode() as im_node:  # Go without additional carry
+                        print(f'IT: {current_state.node.value} -> {im_node.value} (carry: {list(current_state.carry_queue)})')
 
-                            new_state.remove(child.value)
-                            carry_states.append(new_state)
+                        next_state = MutableState(
+                            node=im_node,
+                            carry_queue=copy.copy(current_state.carry_queue),
+                            carry_index=copy.copy(current_state.carry_index),
+                        )
 
-                            print(f'State transition: {state.node.value} -> {new_state.node.value} (carry: {new_state.carry_queue})')
-                            trans = True
+                        next_states.append(next_state)
 
-                    if not trans:
-                        next_states.append(carry_state)
+                # carry_queue = list(current_state.node.children.values())
+                # while carry_queue:
+                #     carry_child = carry_queue.pop()
+
+                #     if carry_child.value in current_state.carry_index:
+
+                #         next_state = MutableState(
+                #             node=carry_child,
+                #             carry_queue=copy.copy(current_state.carry_queue),
+                #             carry_index=copy.copy(current_state.carry_index),
+                #         )
+
+                #         next_state.remove(carry_child.value)
+                #         print(next_state)
+                #         next_states.append(next_state)
+
+                current_state.carry(char)
+                next_states.append(current_state)
 
             match self.root[char]:
                 case InterimNode() | EndNode() as node:
-                    state = State(node)
+                    state = MutableState(node)
                     next_states.append(state)
-                    print(f'State transition: * -> {state.node.value}')
+                    print(f'ST: * -> {state.node.value}')
 
-            active_states, next_states = next_states, []
+            current_states, next_states = next_states, []
 
+        print(current_states)
         print(result)
         return result
 

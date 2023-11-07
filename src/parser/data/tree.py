@@ -23,7 +23,35 @@ class Node:
 
 @dataclasses.dataclass
 class RootNode(Node):
-    ...
+    def prettify(root: RootNode) -> str:
+        # some constants for pretty printing tree structures
+        ROOT_SYMBOL = '*'
+        TAB_SYMBOL = ' '
+        TOKEN_LEN = 11
+
+        result = [ROOT_SYMBOL]
+        prev_depth = math.inf
+
+        stack = [(1, child) for child in root.children.values()]
+
+        while stack:
+            depth, node = stack.pop()
+
+            if prev_depth >= depth:
+                result.append('\n' + TAB_SYMBOL * depth)
+
+            prev_depth = depth
+
+            match node:
+                case EndNode():
+                    result.append('- ' + node.value + ' ' + f'({node.depth}, {node.factor})')
+                case InterimNode():
+                    result.append('- ' + node.value + ' ' + f'({node.depth}, 0)')
+
+            for child in node.children.values():
+                stack.append((depth + TOKEN_LEN, child))
+
+        return ' '.join(result)
 
 
 @dataclasses.dataclass
@@ -34,34 +62,3 @@ class InterimNode(Node):
 @dataclasses.dataclass
 class EndNode(Node):
     factor: int = dataclasses.field(default=1)
-
-
-def pretty(root: RootNode) -> str:
-    # some constants for pretty printing tree structures
-    ROOT_SYMBOL = '*'
-    TAB_SYMBOL = ' '
-    TOKEN_LEN = 11
-
-    result = [ROOT_SYMBOL]
-    prev_depth = math.inf
-
-    stack = [(1, child) for child in root.children.values()]
-
-    while stack:
-        depth, node = stack.pop()
-
-        if prev_depth >= depth:
-            result.append('\n' + TAB_SYMBOL * depth)
-
-        prev_depth = depth
-
-        match node:
-            case EndNode():
-                result.append('- ' + node.value + ' ' + f'({node.depth}, {node.factor})')
-            case InterimNode():
-                result.append('- ' + node.value + ' ' + f'({node.depth}, 0)')
-
-        for child in node.children.values():
-            stack.append((depth + TOKEN_LEN, child))
-
-    return ' '.join(result)

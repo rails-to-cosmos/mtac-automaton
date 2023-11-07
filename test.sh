@@ -9,4 +9,4 @@ else
     pipenv run python -m src.parser.utils.text  # run doctests for utils
 fi
 
-pipenv run pytest . $@  # run unit tests
+pipenv run pytest . --verbose $@ # run unit tests
