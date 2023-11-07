@@ -1,0 +1,9 @@
+[project]
+name = "mtac-automaton"
+version = "0.0.1"
+
+[pytest]
+testpaths = "test"
+
+[tool.pytest.ini_options]
+pythonpath = "src"

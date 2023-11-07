@@ -1,4 +1,12 @@
 #!/bin/bash
 
-pipenv run mypy .
-pipenv run python -m doctest -v src/automaton.py
+set -e
+
+if [[ "$*" == *"-k"* ]]; then
+    echo "Running specific test case (skip other checks)"
+else
+    pipenv run mypy .  # run type checks
+    pipenv run python -m src.parser.utils.text  # run doctests for utils
+fi
+
+pipenv run pytest . $@  # run unit tests

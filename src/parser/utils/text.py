@@ -38,3 +38,8 @@ def normalize_word(word: str) -> str:
         return word
 
     return word[0] + ''.join(sorted(word[1:len(word) - 1])) + word[-1]
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

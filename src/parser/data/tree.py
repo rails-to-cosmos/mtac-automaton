@@ -4,7 +4,7 @@ import math
 from typing import *
 from dataclasses import dataclass
 
-from src.utils.text import normalize_word
+from parser.utils.text import normalize_word
 
 
 class Node:

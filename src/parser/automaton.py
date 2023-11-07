@@ -1,5 +1,5 @@
-from src.data.tree import RootNode, EndNode, IntermediateNode, Node
-from src.utils.text import normalize_word
+from parser.data.tree import RootNode, EndNode, IntermediateNode, Node
+from parser.utils.text import normalize_word
 
 
 class Automaton:

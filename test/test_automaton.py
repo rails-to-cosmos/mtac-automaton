@@ -1,8 +1,8 @@
-from src.automaton import Automaton
+from parser.automaton import Automaton
 
-if __name__ == '__main__':
-
+def test_automaton_stores_sorted_representations():
     automaton = Automaton()
+
     automaton.add_word('aapxj')
     automaton.add_word('apaxj')
     automaton.add_word('apaxd')
