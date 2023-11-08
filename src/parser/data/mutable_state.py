@@ -4,8 +4,8 @@ from collections import deque
 from dataclasses import dataclass
 from dataclasses import field
 
-from parser.data.tree import InterimNode
-from parser.data.tree import EndNode
+from parser.data.trie import InterimNode
+from parser.data.trie import EndNode
 
 
 @dataclass

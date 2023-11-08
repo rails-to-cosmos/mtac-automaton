@@ -7,11 +7,12 @@ from typing import Optional
 from parser.utils.text import normalize_word
 
 
-# TODO: consider frozen nodes
 @dataclasses.dataclass
 class Node:
     value: str = dataclasses.field(default='')
     depth: int = dataclasses.field(default=0)
+    flinks: []
+    parent: Node
     children: dict[str, InterimNode | EndNode] = dataclasses.field(default_factory=dict)
 
     def __getitem__(self, key: str) -> InterimNode | EndNode | None:

@@ -3,7 +3,7 @@ import copy
 from typing import List
 
 from parser.data.mutable_state import MutableState
-from parser.data.tree import RootNode, EndNode, InterimNode, Node
+from parser.data.trie import RootNode, EndNode, InterimNode, Node
 from parser.utils.text import normalize_word
 
 
