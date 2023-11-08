@@ -1,6 +1,6 @@
 from bisect import insort, bisect_left
 from collections import defaultdict
-from typing import Tuple, Dict, Set, List
+from typing import Tuple, Dict, List, Set
 
 
 class ScrambledWordMatcher:
@@ -59,7 +59,7 @@ class ScrambledWordMatcher:
             for word_length in self.word_lengths
         }
 
-        seen = set()
+        seen: Set[Tuple[Tuple[str, str], str]] = set()
 
         for i, char in enumerate(text):
             for word_length in self.word_lengths:
@@ -74,6 +74,9 @@ class ScrambledWordMatcher:
                 window = sliding_windows[word_length]
                 window[char] += 1
 
+                # In the naive approach, I sort each candidate.
+                # It leads to O(20 * n * log(n)) overall complexity in the worst case.
+                # This could be improved by using hash maps for counting and comparison.
                 candidate = ''.join(sorted(text[i + 1: i + word_length - 1]))
 
                 if candidate in self.index[key] and (key, candidate) not in seen:

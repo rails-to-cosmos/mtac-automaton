@@ -19,7 +19,7 @@ def unique_words_list(draw, min_size=2, max_size=20, list_max_size=100) -> List[
     return draw(st.lists(random_words(min_size=min_size, max_size=max_size),
                          unique=True, max_size=list_max_size))
 
-class TestScrambledWordMatcherProperties(unittest.TestCase):
+class TestScrambledWordMatcher(unittest.TestCase):
 
     @given(unique_words_list(), random_words())
     def test_no_false_positives(self, dictionary: List[str], non_dict_word: str) -> None:

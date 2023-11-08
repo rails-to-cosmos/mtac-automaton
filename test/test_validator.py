@@ -3,7 +3,7 @@ from unittest.mock import patch, mock_open
 from entrypoint import main, validate_dictionary, validate_input_file
 
 
-class TestScrambledStringMatcher(unittest.TestCase):
+class TestScrambledWordMatcher(unittest.TestCase):
     def test_valid_dictionary(self) -> None:
         mock_dictionary_content = "word\nanother\nyetanotherword\n"
         with patch('builtins.open', mock_open(read_data=mock_dictionary_content)):
