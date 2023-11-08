@@ -1,8 +1,8 @@
-from mtac.automaton import Automaton
+from mtac.automaton import ScrambledWordMatcher
 
-automaton = Automaton()
+automaton = ScrambledWordMatcher()
 
-# automaton = Automaton()
+# automaton = ScrambledWordMatcher()
 
 # automaton.add_word('aapxj')
 # automaton.add_word('apaxj')
@@ -14,7 +14,7 @@ automaton = Automaton()
 
 # automaton.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt')
 
-# automaton = Automaton()
+# automaton = ScrambledWordMatcher()
 
 # automaton.add_word('abez')
 # automaton.add_word('abfy')
@@ -37,10 +37,18 @@ automaton = Automaton()
 # automaton.scan('aapxjdnrbt')
 # print(automaton.root.prettify())
 
-automaton.add_word('axpaj')
-automaton.add_word('apxaj')
-automaton.add_word('dnrbt')
-automaton.add_word('pjxdn')
-automaton.add_word('abd')
+# automaton.add_word('axpaj')
+# automaton.add_word('apxaj')
+# automaton.add_word('dnrbt')
+# automaton.add_word('pjxdn')
+# automaton.add_word('abd')
 
-automaton.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt')
+# automaton.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt')
+
+automaton.add_word('star')
+automaton.add_word('loop')
+automaton.add_word('part')
+automaton.scan('wtsartsatroplopratlopostar')
+# print(automaton.root.prettify())
+#
+# print(automaton.root.prettify())

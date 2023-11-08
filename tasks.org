@@ -8,3 +8,4 @@
 ** TODO Fix carry size
 * Optimizations
 ** TODO Early exit
+** TODO Reset automaton

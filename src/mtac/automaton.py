@@ -1,61 +1,35 @@
-from typing import List
+from collections import defaultdict
+from typing import Tuple, Dict, Set
 
-from mtac.data.trie import Node
-from mtac.data.trie import RootNode
-from mtac.utils.text import normalize_word
+Index = Dict[Tuple[str, str], Dict[str, int]]
 
 
-class Automaton:
+class ScrambledWordMatcher:
     def __init__(self) -> None:
-        self.root: RootNode = RootNode()
+        self.index: Index = defaultdict(lambda: defaultdict(int))
+        self.word_lengths: Set[int] = set()
 
     def add_word(self, word: str) -> None:
-        normalized_word = normalize_word(word)
-        word_depth = len(normalized_word)  # word depth determines a carry size
-
-        current_node: Node = self.root
-        for index, char in enumerate(normalized_word):
-            is_term_char = index == word_depth - 1
-
-            if char in current_node.children:  # char has already been visited
-                child = current_node[char]
-                max_depth = max(child.depth, word_depth)
-                child.weight += 1
-                child.terminator = child.terminator or is_term_char
-            else:
-                max_depth = max(current_node.depth, word_depth)
-
-                child = Node(
-                    parent=current_node,
-                    value=char,
-                    terminator=is_term_char,
-                )
-
-                current_node[char] = child
-
-            child.depth = max_depth
-            current_node = child
+        scramble = ''.join(sorted(word[1:-1]))
+        self.index[(word[0], word[-1])][scramble] += 1
+        self.word_lengths.add(len(word))
 
     def scan(self, text: str) -> int:
-        print(f'Scan: "{text}"')
+        count = 0
+        word_lengths = sorted(self.word_lengths)
 
-        result = 0
+        for i, char in enumerate(text):
+            for word_length in word_lengths:
 
-        active_states: List[Node] = [self.root]
-        state_buffer: List[Node] = []
+                if i + word_length > len(text):
+                    continue
 
-        for char in text:
-            print('---')
-            print(f'Char: {char}')
-            while active_states:
-                state = active_states.pop()
-                new_states, matches = state.goto(char)
-                state_buffer.extend(new_states)
-                result += matches
-            # print(f'States ({len(state_buffer)}):')
-            # for state in state_buffer:
-            #     print(f'- {str(state)}')
-            active_states, state_buffer = state_buffer, []
+                key = (char, text[i + word_length - 1])
+                if key in self.index:
+                    candidate = ''.join(sorted(text[i + 1: i + word_length - 1]))
 
-        print(f'Result: {result}')
-        return result
+                    if candidate in self.index[key]:
+                        count += self.index[key][candidate]
+                        self.index[key][candidate] = 0
+
+        return count
