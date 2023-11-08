@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import math
 import dataclasses
+
 from typing import Optional
 
 from parser.utils.text import normalize_word
@@ -11,12 +12,16 @@ from parser.utils.text import normalize_word
 class Node:
     value: str = dataclasses.field(default='')
     depth: int = dataclasses.field(default=0)
-    flinks: []
-    parent: Node
-    children: dict[str, InterimNode | EndNode] = dataclasses.field(default_factory=dict)
+    parent: Optional[Node] = None
+    children: dict[str, Node] = dataclasses.field(default_factory=dict)
+    weight: int = dataclasses.field(default=1)
+    terminator: bool = False
 
-    def __getitem__(self, key: str) -> InterimNode | EndNode | None:
-        return self.children.get(key)
+    def __getitem__(self, key: str) -> Node:
+        return self.children[key]
+
+    def __setitem__(self, key: str, value: Node) -> None:
+        self.children[key] = value
 
     def __contains__(self, key: str) -> bool:
         return key in self.children
@@ -43,23 +48,10 @@ class RootNode(Node):
 
             prev_depth = depth
 
-            match node:
-                case EndNode():
-                    result.append('- ' + node.value + ' ' + f'({node.depth}, {node.factor})')
-                case InterimNode():
-                    result.append('- ' + node.value + ' ' + f'({node.depth}, 0)')
+            if node:
+                result.append('- ' + node.value + ' ' + f'({node.depth}, {node.weight})')
 
             for child in node.children.values():
                 stack.append((depth + TOKEN_LEN, child))
 
         return ' '.join(result)
-
-
-@dataclasses.dataclass
-class InterimNode(Node):
-    ...
-
-
-@dataclasses.dataclass
-class EndNode(Node):
-    factor: int = dataclasses.field(default=1)

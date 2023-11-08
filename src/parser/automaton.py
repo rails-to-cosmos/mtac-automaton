@@ -3,7 +3,8 @@ import copy
 from typing import List
 
 from parser.data.mutable_state import MutableState
-from parser.data.trie import RootNode, EndNode, InterimNode, Node
+from parser.data.trie import Node
+from parser.data.trie import RootNode
 from parser.utils.text import normalize_word
 
 
@@ -11,11 +12,31 @@ class Automaton:
     def __init__(self) -> None:
         self.root: RootNode = RootNode()
 
-    def validate_input(self, s: str) -> None:
-        ...
+    def add_word(self, word: str) -> None:
+        normalized_word = normalize_word(word)
+        word_depth = len(normalized_word)  # word depth determines a sliding window size
 
-    def validate_dictionary(self, s: str) -> None:
-        ...
+        current_node: Node = self.root
+        for index, char in enumerate(normalized_word):
+            is_term_char = index == word_depth - 1
+
+            if char in current_node.children:  # char has already been visited
+                child = current_node[char]
+                max_depth = max(child.depth, word_depth)
+                child.weight += 1
+                child.terminator = child.terminator or is_term_char
+                child.depth = max_depth
+            else:
+                max_depth = max(current_node.depth, word_depth)
+
+                child = Node(parent=current_node,
+                             value=char,
+                             depth=max_depth,
+                             terminator=is_term_char)
+
+                current_node[char] = child
+
+            current_node = child
 
     def scan(self, text: str) -> int:
         print(f'Scan: "{text}"')
@@ -30,31 +51,40 @@ class Automaton:
                 print(current_states)
 
                 current_state = current_states.pop()
+                node = current_state.node[char]
 
-                match current_state.node[char]:
-                    case EndNode(factor=factor) as end_node:  # Word found!
-                        result += factor
-                        print(f'+{factor} ET: {current_state.node.value} -> {end_node.value} (carry: {list(current_state.carry_queue)})')
-                        print(self.root.prettify())
-                        end_node.factor = 0  # TODO Update node type / write it to (seen) / remove all factor 0
+                if not node:  # go without carry
+                    ...
+                elif node.terminator:  # word found!
+                    result += node.weight
+                    print(f'+{node.weight} ET: {current_state.node.value} -> {node.value} (carry: {list(current_state.carry_queue)})')
+                    print(self.root.prettify())
 
-                        next_state = MutableState(
-                            node=end_node,
-                            carry_queue=copy.copy(current_state.carry_queue),
-                            carry_index=copy.copy(current_state.carry_index),
-                        )
+                    node.terminator = False
 
-                        next_states.append(next_state)
-                    case InterimNode() as im_node:  # Go without additional carry
-                        print(f'IT: {current_state.node.value} -> {im_node.value} (carry: {list(current_state.carry_queue)})')
+                    # Decrease weights of a subtree
+                    visited: Node = node
+                    while not isinstance(visited, RootNode):
+                        visited.weight -= 1
+                        visited = visited.parent
 
-                        next_state = MutableState(
-                            node=im_node,
-                            carry_queue=copy.copy(current_state.carry_queue),
-                            carry_index=copy.copy(current_state.carry_index),
-                        )
+                    next_state = MutableState(
+                        node=node,
+                        carry_queue=copy.copy(current_state.carry_queue),
+                        carry_index=copy.copy(current_state.carry_index),
+                    )
 
-                        next_states.append(next_state)
+                    next_states.append(next_state)
+                else:  # im node
+                    print(f'IT: {current_state.node.value} -> {node.value} (carry: {list(current_state.carry_queue)})')
+
+                    next_state = MutableState(
+                        node=node,
+                        carry_queue=copy.copy(current_state.carry_queue),
+                        carry_index=copy.copy(current_state.carry_index),
+                    )
+
+                    next_states.append(next_state)
 
                 # carry_queue = list(current_state.node.children.values())
                 # while carry_queue:
@@ -75,64 +105,13 @@ class Automaton:
                 current_state.carry(char)
                 next_states.append(current_state)
 
-            match self.root[char]:
-                case InterimNode() | EndNode() as node:
-                    state = MutableState(node)
-                    next_states.append(state)
-                    print(f'ST: * -> {state.node.value}')
+            if char in self.root:
+                new_state = MutableState(node)
+                next_states.append(new_state)
+                print(f'ST: * -> {node.value}')
 
             current_states, next_states = next_states, []
 
         print(current_states)
         print(result)
         return result
-
-    def add_word(self, word: str) -> None:
-        normalized_word = normalize_word(word)
-        depth = len(normalized_word)
-
-        current_node: Node = self.root
-        for carry_index, char in enumerate(normalized_word):
-            is_last_node = carry_index == depth - 1
-
-            if char in current_node.children:
-                max_depth = max(current_node.children[char].depth, depth)
-
-                if is_last_node:
-                    match current_node.children[char]:
-                        case EndNode() as end_node:
-                            current_node.children[char] = EndNode(
-                                children=end_node.children,
-                                value=char,
-                                depth=max_depth,
-                                factor=end_node.factor + 1,
-                            )
-                        case InterimNode() as im:
-                            current_node.children[char] = EndNode(
-                                children=im.children,
-                                value=char,
-                                depth=max_depth,
-                                factor=1,
-                            )
-
-                match current_node:
-                    case RootNode():
-                        ...
-                    case _:
-                        current_node.depth = max_depth
-
-                current_node = current_node.children[char]
-                current_node.depth = max_depth
-            else:
-                match current_node:
-                    case RootNode():
-                        max_depth = depth
-                    case node:
-                        max_depth = max(node.depth, depth)
-
-                new_node: InterimNode | EndNode = EndNode(value=char, depth=max_depth, factor=1) \
-                    if is_last_node \
-                       else InterimNode(value=char, depth=max_depth)
-
-                current_node.children[char] = new_node
-                current_node = new_node

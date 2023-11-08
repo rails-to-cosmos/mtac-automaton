@@ -16,11 +16,11 @@ from parser.automaton import Automaton
 
 #     print(' '.join(automaton.root.prettify()))
 
-def test_automaton_factors():
+def test_automaton_weights():
     automaton = Automaton()
     automaton.add_word('axpaj')
     automaton.add_word('apxaj')
-    assert automaton.root['a']['a']['p']['x']['j'].factor == 2
+    assert automaton.root['a']['a']['p']['x']['j'].weight == 2
 
 # TODO Test multiple occs
 

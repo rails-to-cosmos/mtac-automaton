@@ -1,3 +1,6 @@
+* TODO Validation
+** TODO Validate input
+** TODO Validate dictionary
 * Tests
 ** TODO Test automaton node compaction
 ** TODO Test end nodes

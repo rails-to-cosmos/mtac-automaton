@@ -4,13 +4,12 @@ from collections import deque
 from dataclasses import dataclass
 from dataclasses import field
 
-from parser.data.trie import InterimNode
-from parser.data.trie import EndNode
+from parser.data.trie import Node
 
 
 @dataclass
 class MutableState:
-    node: InterimNode | EndNode
+    node: Node
 
     # carrying sliding window with index for lookup optimization
     carry_queue: deque = field(default_factory=deque)
