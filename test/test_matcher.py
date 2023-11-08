@@ -1,59 +1,60 @@
+import unittest
 from matcher import ScrambledWordMatcher
 
-def test_carry():
-    matcher = ScrambledWordMatcher()
 
-    matcher.add_word('abez')
-    matcher.add_word('abfy')
+class TestScrambledWordMatcher(unittest.TestCase):
+    def test_definition(self):
+        "Test case from the task definition."
 
-    assert matcher.scan('aebz') == 1
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('axpaj')
+        matcher.add_word('apxaj')
+        matcher.add_word('dnrbt')
+        matcher.add_word('pjxdn')
+        matcher.add_word('abd')
 
-def test_definition():
-    matcher = ScrambledWordMatcher()
+        self.assertEqual(matcher.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt'), 4)
 
-    matcher.add_word('axpaj')
-    matcher.add_word('apxaj')
-    matcher.add_word('dnrbt')
-    matcher.add_word('pjxdn')
-    matcher.add_word('abd')
+    def test_carry(self):
+        "Checks scrambled matching."
 
-    assert matcher.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt') == 4
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('abez')
+        matcher.add_word('abfy')
+        self.assertEqual(matcher.scan('aebz'), 1)
 
-def test_finish_on_carry():
-    matcher = ScrambledWordMatcher()
+    def test_finish_on_carry(self):
+        "Checks if matcher handles sliding windows properly."
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('abeaz')
+        matcher.add_word('abfy')
+        self.assertEqual(matcher.scan('abeaz'), 1)
 
-    matcher.add_word('abeaz')
-    matcher.add_word('abfy')
+    def test_miss(self):
+        "No false positives should arise."
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('abeaz')
+        matcher.add_word('abfy')
+        self.assertEqual(matcher.scan('abyf'), 0)
 
-    assert matcher.scan('abeaz') == 1
+    def test_simple(self):
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('star')
+        matcher.add_word('loop')
+        matcher.add_word('part')
+        self.assertEqual(matcher.scan('wtsartsatroplopratlopostar'), 2)
 
-def test_miss():
-    matcher = ScrambledWordMatcher()
+    def test_multi_scan(self):
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('axpaj')
+        matcher.add_word('apxaj')
+        matcher.add_word('dnrbt')
+        matcher.add_word('pjxdn')
+        matcher.add_word('abd')
+        self.assertEqual(matcher.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt'), 4)
+        self.assertEqual(matcher.scan('aapxj'), 2)
+        self.assertEqual(matcher.scan('adb'), 0)
+        self.assertEqual(matcher.scan('adbtpdxjn'), 1)
 
-    matcher.add_word('abeaz')
-    matcher.add_word('abfy')
-
-    assert matcher.scan('abyf') == 0
-
-def test_simple():
-    matcher = ScrambledWordMatcher()
-
-    matcher.add_word('star')
-    matcher.add_word('loop')
-    matcher.add_word('part')
-
-    assert matcher.scan('wtsartsatroplopratlopostar') == 2
-
-def test_multi_scan():
-    matcher = ScrambledWordMatcher()
-
-    matcher.add_word('axpaj')
-    matcher.add_word('apxaj')
-    matcher.add_word('dnrbt')
-    matcher.add_word('pjxdn')
-    matcher.add_word('abd')
-
-    assert matcher.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt') == 4
-    assert matcher.scan('aapxj') == 2
-    assert matcher.scan('adb') == 0
-    assert matcher.scan('adbtpdxjn') == 1
+if __name__ == '__main__':
+    unittest.main()
