@@ -4,3 +4,7 @@
 * Tests
 ** TODO Test automaton node compaction
 ** TODO Test end nodes
+* Bugs
+** TODO Fix carry size
+* Optimizations
+** TODO Early exit

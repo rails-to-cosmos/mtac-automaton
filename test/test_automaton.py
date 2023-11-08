@@ -1,4 +1,4 @@
-from parser.automaton import Automaton
+from mtac.automaton import Automaton
 
 # def test_automaton_stores_sorted_representations():
 #     automaton = Automaton()
@@ -22,8 +22,13 @@ def test_automaton_weights():
     automaton.add_word('apxaj')
     assert automaton.root['a']['a']['p']['x']['j'].weight == 2
 
-# TODO Test multiple occs
+def test_carry():
+    automaton = Automaton()
 
+    automaton.add_word('abez')
+    automaton.add_word('abfy')
+
+    assert automaton.scan('aebz') == 1
 
 def test_definition():
     automaton = Automaton()
@@ -34,17 +39,16 @@ def test_definition():
     automaton.add_word('pjxdn')
     automaton.add_word('abd')
 
-    print(automaton.root.prettify())
     assert automaton.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt') == 4
 
-def test_finish_on_carry():
-    automaton = Automaton()
+# def test_finish_on_carry():
+#     automaton = Automaton()
 
-    automaton.add_word('abeaz')
-    automaton.add_word('abfy')
+#     automaton.add_word('abeaz')
+#     automaton.add_word('abfy')
 
-    print(automaton.root.prettify())
-    assert automaton.scan('abeaz') == 1
+#     print(automaton.root.prettify())
+#     assert automaton.scan('abeaz') == 1
 
 # def test_finish_on_carry_2():
 #     automaton = Automaton()
