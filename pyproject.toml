@@ -1,5 +1,5 @@
 [project]
-name = "mtac-automaton"
+name = "matcher"
 version = "0.0.1"
 
 [pytest]

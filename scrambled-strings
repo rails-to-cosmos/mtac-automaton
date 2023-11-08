@@ -4,4 +4,4 @@ set -e
 
 export PYTHONPATH="src"
 
-pipenv run python -m src
+pipenv run python -m src.entrypoint $@
