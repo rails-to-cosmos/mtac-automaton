@@ -101,7 +101,7 @@ The Scrambled Word Matcher is designed to efficiently match words from a diction
 
 Memory usage is primarily due to the storage of sorted character counts:
 
-- Dictionary Storage: O(W * L), where W is the number of words and L is the average word length.
+- Dictionary Storage: O(W * L), where W is the number of words and L is the maximum word length.
 
 - Sliding Window: O(L), with a single sliding window traversing the text.
 
