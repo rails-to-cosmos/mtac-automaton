@@ -6,6 +6,12 @@ from scrambled_word_matcher.logger import init_logger
 TEST_LOGGER = init_logger('test.matcher')
 
 class TestScrambledWordMatcher(unittest.TestCase):
+    def test_empty(self):
+        "Test empty dictionary."
+
+        matcher = ScrambledWordMatcher(TEST_LOGGER)
+        self.assertEqual(matcher.scan('hello'), 0)
+
     def test_definition(self):
         "Test case from the task definition."
 
@@ -18,7 +24,7 @@ class TestScrambledWordMatcher(unittest.TestCase):
 
         self.assertEqual(matcher.scan('aapxjdnrbtvldptfzbbdbbzxtndrvjblnzjfpvhdhhpxjdnrbt'), 4)
 
-    def test_carry(self):
+    def test_scramble(self):
         "Checks scrambled matching."
 
         matcher = ScrambledWordMatcher(TEST_LOGGER)
@@ -27,7 +33,7 @@ class TestScrambledWordMatcher(unittest.TestCase):
 
         self.assertEqual(matcher.scan('aebz'), 1)
 
-    def test_finish_on_carry(self):
+    def test_scramble_terminate(self):
         "Checks if matcher handles sliding windows properly."
 
         matcher = ScrambledWordMatcher(TEST_LOGGER)
@@ -36,7 +42,7 @@ class TestScrambledWordMatcher(unittest.TestCase):
 
         self.assertEqual(matcher.scan('abeaz'), 1)
 
-    def test_miss(self):
+    def test_false_positive(self):
         "No false positives should arise."
 
         matcher = ScrambledWordMatcher(TEST_LOGGER)
@@ -53,7 +59,7 @@ class TestScrambledWordMatcher(unittest.TestCase):
 
         self.assertEqual(matcher.scan('wtsartsatroplopratlopostar'), 2)
 
-    def test_simple_long(self):
+    def test_long_input(self):
         matcher = ScrambledWordMatcher(TEST_LOGGER)
         matcher.add_word('aaaaaaaa')
         matcher.add_word('ab')
