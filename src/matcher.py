@@ -1,4 +1,3 @@
-from bisect import insort, bisect_left
 from collections import defaultdict
 from typing import Tuple, Dict, List, Set
 
@@ -17,7 +16,7 @@ class ScrambledWordMatcher:
 
     def __init__(self) -> None:
         self.index: Dict[Tuple[str, str], Dict[str, int]] = defaultdict(lambda: defaultdict(int))
-        self.word_lengths: List[int] = []
+        self.word_lengths: Set[int] = set()
         self.word_count: int = 0
 
     def add_word(self, word: str) -> None:
@@ -33,12 +32,7 @@ class ScrambledWordMatcher:
         key = (word[0], word[-1])
         scramble = ''.join(sorted(word[1:-1]))
         self.index[key][scramble] += 1
-
-        lookup = len(word)
-        index = bisect_left(self.word_lengths, lookup)
-        if index == len(self.word_lengths) or self.word_lengths[index] != lookup:
-            insort(self.word_lengths, lookup)
-
+        self.word_lengths.add(len(word))
         self.word_count += 1
 
     def scan(self, text: str) -> int:
@@ -62,7 +56,7 @@ class ScrambledWordMatcher:
         seen: Set[Tuple[Tuple[str, str], str]] = set()
 
         for i, char in enumerate(text):
-            for word_length in self.word_lengths:
+            for word_length in sorted(self.word_lengths):
 
                 if i + word_length > len(text):
                     break

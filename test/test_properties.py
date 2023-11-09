@@ -1,17 +1,19 @@
 import unittest
+import string
+from typing import Tuple, List
 from hypothesis import given, strategies as st
 from matcher import ScrambledWordMatcher
-from typing import Tuple, List
+
 
 @st.composite
 def arbitrary_scramblings(draw) -> Tuple[str, str]:
-    base_word = draw(st.text(min_size=3, max_size=20, alphabet=st.characters(whitelist_categories=['Lu', 'Ll'])))
+    base_word = draw(st.text(min_size=3, max_size=20, alphabet=string.ascii_lowercase))
     first, middle, last = base_word[0], list(base_word[1:-1]), base_word[-1]
     scrambled_middle = draw(st.permutations(middle))
     return base_word, first + ''.join(scrambled_middle) + last
 
 @st.composite
-def random_words(draw, alphabet=st.characters(whitelist_categories=['Lu', 'Ll']), min_size=2, max_size=20) -> str:
+def random_words(draw, alphabet=string.ascii_lowercase, min_size=2, max_size=20) -> str:
     return draw(st.text(alphabet=alphabet, min_size=min_size, max_size=max_size))
 
 @st.composite
