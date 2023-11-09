@@ -2,16 +2,12 @@ from functools import cache
 from collections import defaultdict
 from typing import Tuple, Dict, Set, List
 
-ALPHABET_SIZE = 26
+from scrambled_word_matcher.validations import validate_dictionary
+from scrambled_word_matcher.validations import validate_input_file
+from scrambled_word_matcher.validations import validate_char
+from scrambled_word_matcher.validations import ALPHABET_SIZE
 
 CharCountTable = Tuple[int, ...]  # Tuple of ALPHABET_SIZE items
-
-
-@cache
-def validate_char(char: str) -> None:
-    char_lookup_index = ord(char) - ord('a')
-    if not 0 <= char_lookup_index < ALPHABET_SIZE:
-        raise ValueError('Unexpected symbol: %s', char)
 
 
 @cache
@@ -44,14 +40,28 @@ class ScrambledWordMatcher:
         self.word_lengths: Set[int] = set()
         self.word_count: int = 0
 
-    def add_word(self, word: str) -> None:
-        key = (word[0], word[-1])
+    def add_dictionary(self, dictionary_path: str) -> None:
+        validate_dictionary(dictionary_path)
 
-        # Use counting sort to create a tuple representing the character counts
+        with open(dictionary_path, 'r', encoding='utf-8') as dictionary_file:
+            for line in dictionary_file:
+                self.add_word(line.strip())
+
+    def add_word(self, word: str) -> None:
+        # Use counting sort to create a tuple representing the character counts internally.
+        key = (word[0], word[-1])
         scramble = counting_sort_chars(word)
         self.index[key][scramble] += 1
         self.word_lengths.add(len(word))
         self.word_count += 1
+
+    def scan_file(self, input_path: str) -> None:
+        validate_input_file(input_path)
+
+        with open(input_path, 'r', encoding='utf-8') as input_file:
+            for case_number, line in enumerate(input_file, start=1):
+                matches = self.scan(line.strip())
+                print(f'Case #{case_number}: {matches}')
 
     def scan(self, text: str) -> int:
         matches = 0

@@ -1,5 +1,17 @@
+from functools import cache
+
+ALPHABET_SIZE = 26
+
+
+@cache
+def validate_char(char: str) -> None:
+    char_lookup_index = ord(char) - ord('a')
+    if not 0 <= char_lookup_index < ALPHABET_SIZE:
+        raise ValueError('Unexpected symbol: %s', char)
+
+
 def validate_dictionary(dictionary_path: str) -> None:
-    with open(dictionary_path, 'r') as dictionary_file:
+    with open(dictionary_path, 'r', encoding='utf-8') as dictionary_file:
         dictionary_words = set()
         for line_number, line in enumerate(dictionary_file, start=1):
             word = line.strip()
@@ -13,7 +25,7 @@ def validate_dictionary(dictionary_path: str) -> None:
 
 
 def validate_input_file(input_path: str) -> None:
-    with open(input_path, 'r') as input_file:
+    with open(input_path, 'r', encoding='utf-8') as input_file:
         for line_number, line in enumerate(input_file, start=1):
             if not (1 <= line_number <= 100):
                 raise ValueError("Input file exceeds 100 lines limit")
