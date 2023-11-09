@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-export PYTHONPATH="scrambled_word_matcher"
 
 if [[ "$*" == *"-k"* ]]; then
     echo "Running specific test case (skip other checks)"
