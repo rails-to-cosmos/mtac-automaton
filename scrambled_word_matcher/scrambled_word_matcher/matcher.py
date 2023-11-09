@@ -5,6 +5,9 @@ from functools import cache
 from collections import defaultdict
 from typing import Tuple, Dict, Set, List
 
+from concurrent.futures import ThreadPoolExecutor
+import threading
+
 from scrambled_word_matcher.constraints import validate_dictionary
 from scrambled_word_matcher.constraints import validate_input_file
 from scrambled_word_matcher.constraints import validate_char
@@ -98,6 +101,7 @@ class ScrambledWordMatcher:
         self.word_lengths: Set[int] = set()
         self.word_count: int = 0
         self.logger = logger
+        self.lock = threading.Lock()
 
     def import_dictionary(self, dictionary_path: str) -> None:
         validate_dictionary(dictionary_path)
@@ -105,6 +109,10 @@ class ScrambledWordMatcher:
         with open(dictionary_path, 'r', encoding='utf-8') as dictionary_file:
             for line in dictionary_file:
                 self.add_word(line.strip())
+
+    def add_words(self, words: List[str]) -> None:
+        with ThreadPoolExecutor() as executor:
+            executor.map(self.add_word, words)
 
     def add_word(self, word: str) -> None:
         """
@@ -139,9 +147,10 @@ class ScrambledWordMatcher:
         key = (word[0], word[-1])
         scramble = counting_sort_chars(word)
 
-        self.index[key][scramble] += 1
-        self.word_lengths.add(len(word))
-        self.word_count += 1
+        with self.lock:
+            self.index[key][scramble] += 1
+            self.word_lengths.add(len(word))
+            self.word_count += 1
 
     def scan_file(self, input_path: str) -> List[int]:
         """
