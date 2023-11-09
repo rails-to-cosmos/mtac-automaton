@@ -1,15 +1,30 @@
+import sys
 import argparse
 
 from scrambled_word_matcher.logger import init_logger
+from scrambled_word_matcher.constraints import DictionaryValidationError
+from scrambled_word_matcher.constraints import InputValidationError
 from scrambled_word_matcher import ScrambledWordMatcher
 
 
-def main(dictionary_path: str, input_path: str):
+def main(dictionary_path: str, input_path: str) -> None:
     logger = init_logger('main')
 
     matcher = ScrambledWordMatcher(logger)
-    matcher.add_dictionary(dictionary_path)
-    matcher.scan_file(input_path)
+
+    try:
+        matcher.add_dictionary(dictionary_path)
+    except DictionaryValidationError as exc:
+        logger.error('Dictionary validation failed:')
+        logger.error(str(exc))
+        sys.exit(1)
+
+    try:
+        matcher.scan_file(input_path)
+    except InputValidationError as exc:
+        logger.error('Input validation failed:')
+        logger.error(str(exc))
+        sys.exit(1)
 
 
 if __name__ == "__main__":
