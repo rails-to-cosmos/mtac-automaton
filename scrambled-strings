@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
+export PYTHONPATH="scrambled_word_matcher"
 
-export PYTHONPATH="src"
-
-pipenv run python src/entrypoint.py $@
+pipenv run python -m scrambled_word_matcher $@

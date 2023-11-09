@@ -26,6 +26,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Scrambled String Matcher CLI')
     parser.add_argument('--dictionary', type=str, required=True, help='Path to the dictionary file')
     parser.add_argument('--input', type=str, required=True, help='Path to the input file')
+
     args = parser.parse_args()
 
     main(args.dictionary, args.input)
