@@ -202,9 +202,10 @@ class ScrambledWordMatcher:
 
             for word_length in self.word_lengths:
                 right_index = left_index + word_length - 1
-
-                if left_index + word_length > len(text):
-                    continue  # We could even break if self.word_lengths is sorted
+                if right_index >= len(text):
+                    continue  # Potential optimization: we could break if self.word_lengths is sorted.
+                right_char = text[right_index]
+                validate_char(right_char)
 
                 window_counts = sliding_window_counts[word_length]
                 if left_index > 0:  # Decrement the count for the character that's sliding out of the window
@@ -217,12 +218,11 @@ class ScrambledWordMatcher:
                         validate_char(sliding_in_char)
                         window_counts[ord(sliding_in_char) - ord('a')] += 1
 
-                right_char = text[right_index]
                 key = (left_char, right_char)
                 if key not in self.index:
                     continue
 
-                # Create a tuple from the window counts for comparison
+                # Create a tuple from the window counts for efficient comparison
                 candidate = tuple(window_counts)
                 if candidate in self.index[key] and (key, candidate) not in seen:
                     matches += self.index[key][candidate]
