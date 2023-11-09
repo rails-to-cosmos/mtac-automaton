@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Tuple, Dict, List, Set
+from typing import Tuple, Dict, Set
 
 
 # @dataclass(frozen=True)
@@ -92,7 +92,7 @@ class ScrambledWordMatcher:
 
                 # In the naive approach, I sort each candidate.
                 # It leads to O(20 * n * log(n)) overall complexity in the worst case.
-                # This could be improved by using hash maps for counting and comparison.
+                # This could be improved by using hash maps for counting and comparison in future.
                 candidate = ''.join(sorted(text[i + 1: i + word_length - 1]))
 
                 if candidate in self.index[key] and (key, candidate) not in seen:
