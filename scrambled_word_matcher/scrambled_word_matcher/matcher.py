@@ -106,9 +106,12 @@ class ScrambledWordMatcher:
     def import_dictionary(self, dictionary_path: str) -> None:
         validate_dictionary(dictionary_path)
 
+        dictionary: List[str] = []
         with open(dictionary_path, 'r', encoding='utf-8') as dictionary_file:
             for line in dictionary_file:
-                self.add_word(line.strip())
+                dictionary.append(line.strip())
+
+        self.add_words(dictionary)
 
     def add_words(self, words: List[str]) -> None:
         with ThreadPoolExecutor() as executor:
