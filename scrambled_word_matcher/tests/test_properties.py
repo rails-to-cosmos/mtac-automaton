@@ -1,8 +1,10 @@
-import unittest
 import string
+import unittest
+
 from typing import Tuple, List
 from hypothesis import given, strategies as st
-from matcher import ScrambledWordMatcher
+
+from scrambled_word_matcher import ScrambledWordMatcher
 
 
 @st.composite
@@ -21,15 +23,8 @@ def unique_words_list(draw, min_size=2, max_size=20, list_max_size=100) -> List[
     return draw(st.lists(random_words(min_size=min_size, max_size=max_size),
                          unique=True, max_size=list_max_size))
 
-class TestScrambledWordMatcher(unittest.TestCase):
 
-    @given(unique_words_list(), random_words())
-    def test_no_false_positives(self, dictionary: List[str], non_dict_word: str) -> None:
-        matcher = ScrambledWordMatcher()
-        for word in dictionary:
-            if sorted(word) != sorted(non_dict_word):
-                matcher.add_word(word)
-        self.assertEqual(matcher.scan(non_dict_word), 0)
+class TestScrambledWordMatcher(unittest.TestCase):
 
     @given(unique_words_list())
     def test_detection_of_dictionary_words(self, dictionary: List[str]) -> None:

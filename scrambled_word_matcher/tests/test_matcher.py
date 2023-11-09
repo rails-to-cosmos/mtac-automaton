@@ -1,5 +1,5 @@
 import unittest
-from matcher import ScrambledWordMatcher
+from scrambled_word_matcher import ScrambledWordMatcher
 
 
 class TestScrambledWordMatcher(unittest.TestCase):

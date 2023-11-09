@@ -16,7 +16,12 @@ CLOSED: [2023-11-09 Thu 00:47]
 - State "DONE"       from "TODO"       [2023-11-09 Thu 00:47]
 :END:
 
-* Tests
+* DONE Tests
+CLOSED: [2023-11-09 Thu 09:14]
+:LOGBOOK:
+- State "DONE"       from              [2023-11-09 Thu 09:14]
+:END:
+
 ** CANCELLED Test automaton node compaction
 CLOSED: [2023-11-09 Thu 00:46]
 :LOGBOOK:
@@ -29,7 +34,11 @@ CLOSED: [2023-11-09 Thu 00:46]
 - State "CANCELLED"  from "TODO"       [2023-11-09 Thu 00:46]
 :END:
 
-* Bugs
+* DONE Bugs
+CLOSED: [2023-11-09 Thu 09:14]
+:LOGBOOK:
+- State "DONE"       from              [2023-11-09 Thu 09:14]
+:END:
 Moved to the naive approach from permuted pattern matching algorithm.
 
 ** CANCELLED Fix carry size
@@ -38,7 +47,12 @@ CLOSED: [2023-11-09 Thu 00:46]
 - State "CANCELLED"  from "TODO"       [2023-11-09 Thu 00:46]
 :END:
 
-* Optimizations
+* DONE Optimizations
+CLOSED: [2023-11-09 Thu 09:14]
+:LOGBOOK:
+- State "DONE"       from              [2023-11-09 Thu 09:14]
+:END:
+
 ** DONE Early exit
 CLOSED: [2023-11-09 Thu 00:46]
 :LOGBOOK:

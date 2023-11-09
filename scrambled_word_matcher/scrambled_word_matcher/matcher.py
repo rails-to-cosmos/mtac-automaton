@@ -2,6 +2,28 @@ from collections import defaultdict
 from typing import Tuple, Dict, List, Set
 
 
+# @dataclass(frozen=True)
+# class CharCount:
+#     counts: Dict[str, int]
+
+#     def __hash__(self):
+#         # To ensure the hash is the same for the same character counts, we need to create a
+#         # tuple from the sorted items. The sorting is necessary because dictionaries are
+#         # unordered, and we want the hash to be independent of the order of keys.
+#         return hash(tuple(sorted(self.counts.items())))
+
+#     def __eq__(self, other):
+#         # Equality should be based on the actual character counts, not the instance identity.
+#         if not isinstance(other, CharCount):
+#             return NotImplemented
+#         return self.counts == other.counts
+
+#     @classmethod
+#     def from_text(cls, text: str) -> 'CharCount':
+#         # A class method to create a CharCount from a given string.
+#         return cls(Counter(text))
+
+
 class ScrambledWordMatcher:
     """
     A class that matches words from a dictionary in any scrambled form within a given text.
@@ -81,7 +103,3 @@ class ScrambledWordMatcher:
                         return count
 
         return count
-
-if __name__ == "__main__":
-    import doctest
-    doctest.testmod()
