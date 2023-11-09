@@ -4,12 +4,12 @@ This is a Python utility that enables permuted pattern matching of words. Given 
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will get you a copy of the project up and running on your local machine.
 
 ### Prerequisites
 
-- [devenv](https://devenv.sh) and [direnv](https://direnv.net) for container-less isolated environment
-- [*Optional*] [Docker](https://www.docker.com) or analogue like [Lima](https://github.com/lima-vm/lima), [Podman](https://podman.io) or [Kaniko](https://github.com/GoogleContainerTools/kaniko) for building and running container
+- [devenv](https://devenv.sh) and [direnv](https://direnv.net) for container-less isolated environment.
+- *[Optional]* [Docker](https://www.docker.com) or similar tool like [Lima](https://github.com/lima-vm/lima), [Podman](https://podman.io) or [Kaniko](https://github.com/GoogleContainerTools/kaniko) for the container management.
 
 ### Installation
 
@@ -24,6 +24,7 @@ Install the required dependencies in isolated environment associated with the cu
 
 ```bash
 direnv allow
+pipenv install
 ```
 
 ## Running the Tests
@@ -31,28 +32,12 @@ direnv allow
 To run the tests, execute the following command from the root directory of the project:
 
 ```bash
-devenv shell ./test.sh
-```
-
-or simply (assuming you're already inside devenv shell):
-
-```bash
 ./test.sh
 ```
 
-## Building the Program
-
-The program is a Python script, so there is no build step required.
-
 ## Running the Command
 
-To use ScrambledWordMatcher, you need to provide a dictionary file and an input file. I prepared sample data for you in a `sample` directory. Run the command as follows:
-
-```bash
-devenv shell ./scrambled-strings --dictionary sample/dictionary.txt --input sample/input.txt
-```
-
-or simply (assuming you're already inside devenv shell):
+To use Scrambled Word Matcher, you need to provide a dictionary file and an input file. I prepared sample data for you in a `sample` directory. Run the command as follows:
 
 ```bash
 ./scrambled-strings --dictionary sample/dictionary.txt --input sample/input.txt
@@ -60,7 +45,7 @@ or simply (assuming you're already inside devenv shell):
 
 ## Docker
 
-The `ScrambledWordMatcher` can also be built and run using Docker. This ensures that your execution environment is consistent and isolated from the host system.
+The Scrambled Word Matcher can also be built and run using Docker. This ensures that your execution environment is consistent and isolated from the host system.
 
 ### Building the Docker Image
 
@@ -91,11 +76,11 @@ Please ensure that you have the `dictionary.txt` and `input.txt` files in the `.
 
 ## Algorithmic Overview
 
-The ScrambledWordMatcher utilizes a counting sort approach for the inner characters of words to identify matches in a given text, optimizing search operations and leveraging caching for efficient lookups.
+The Scrambled Word Matcher utilizes a counting sort approach for the inner characters of words to identify matches in a given text, optimizing search operations and leveraging caching for efficient lookups.
 
 ## Complexity Analysis
 
-The `ScrambledWordMatcher` is designed to efficiently match words from a dictionary in any scrambled form within a given text, with the constraint that the first and last letters of the word remain in place. Below is the analysis of time and memory complexities of the underlying algorithms:
+The Scrambled Word Matcher is designed to efficiently match words from a dictionary in any scrambled form within a given text, with the constraint that the first and last letters of the word remain in place. Below is the analysis of time and memory complexities of the underlying algorithms:
 
 ### Time Complexity
 
