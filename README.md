@@ -24,7 +24,7 @@ Install the required dependencies in isolated environment associated with the cu
 
 ```bash
 direnv allow
-pipenv install
+pipenv install --dev
 ```
 
 ## Running the Tests
