@@ -15,6 +15,35 @@ CharCountTable = Tuple[int, ...]  # Tuple of ALPHABET_SIZE items
 
 @cache
 def counting_sort_chars(chars: str) -> CharCountTable:
+    """
+    Counts the occurrences of each character in a string and returns a tuple with these counts.
+
+    Assumes that input string only contains lowercase English letters (a-z): see the constraints.py for the details.
+
+    :param chars: The string of characters to count.
+    :return: A tuple of length ALPHABET_SIZE with the count of each character.
+
+    >>> counting_sort_chars('a')
+    (1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    >>> counting_sort_chars('abc')
+    (1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    >>> counting_sort_chars('zab')
+    (1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1)
+
+    >>> counting_sort_chars('mississippi')
+    (0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 1, 0, 0, 2, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0)
+
+    >>> counting_sort_chars('')  # Empty string should return a tuple of zero counts
+    (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+
+    >>> counting_sort_chars('!')  # Non-alphabet character should raise a ValueError
+    Traceback (most recent call last):
+    ...
+    scrambled_word_matcher.constraints.InputValidationError: Unexpected symbol: !
+    """
+
     count = [0] * ALPHABET_SIZE  # Array of zeros for each letter in the alphabet
     a_ord = ord('a')
 
@@ -23,7 +52,6 @@ def counting_sort_chars(chars: str) -> CharCountTable:
         count[ord(char) - a_ord] += 1
 
     return tuple(count)
-
 
 class ScrambledWordMatcher:
     """
