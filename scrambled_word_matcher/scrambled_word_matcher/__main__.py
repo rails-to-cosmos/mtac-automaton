@@ -1,10 +1,13 @@
 import argparse
 
+from scrambled_word_matcher.logger import init_logger
 from scrambled_word_matcher import ScrambledWordMatcher
 
 
 def main(dictionary_path: str, input_path: str):
-    matcher = ScrambledWordMatcher()
+    logger = init_logger('main')
+
+    matcher = ScrambledWordMatcher(logger)
     matcher.add_dictionary(dictionary_path)
     matcher.scan_file(input_path)
 

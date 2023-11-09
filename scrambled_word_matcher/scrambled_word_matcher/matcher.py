@@ -1,3 +1,5 @@
+import logging
+
 from functools import cache
 from collections import defaultdict
 from typing import Tuple, Dict, Set, List
@@ -5,6 +7,7 @@ from typing import Tuple, Dict, Set, List
 from scrambled_word_matcher.validations import validate_dictionary
 from scrambled_word_matcher.validations import validate_input_file
 from scrambled_word_matcher.validations import validate_char
+
 from scrambled_word_matcher.validations import ALPHABET_SIZE
 
 CharCountTable = Tuple[int, ...]  # Tuple of ALPHABET_SIZE items
@@ -27,18 +30,20 @@ class ScrambledWordMatcher:
     A class that matches words from a dictionary in any scrambled form within a given text.
     The scrambled form must maintain the first and last letter of the word.
 
-    >>> matcher = ScrambledWordMatcher()
+    >>> logger = logging.getLogger('doctest')
+    >>> matcher = ScrambledWordMatcher(logger)
     >>> matcher.add_word('maps')
     >>> matcher.add_word('spam')
     >>> matcher.scan('pamsapms')
     1
     """
 
-    def __init__(self) -> None:
+    def __init__(self, logger: logging.Logger) -> None:
         # The inner dict now holds a tuple (counts of letters) instead of a string
         self.index: Dict[Tuple[str, str], Dict[Tuple, int]] = defaultdict(lambda: defaultdict(int))
         self.word_lengths: Set[int] = set()
         self.word_count: int = 0
+        self.logger = logger
 
     def add_dictionary(self, dictionary_path: str) -> None:
         validate_dictionary(dictionary_path)

@@ -11,6 +11,7 @@ from contextlib import closing
 from typing import List, Tuple, Set
 
 from scrambled_word_matcher import ScrambledWordMatcher
+from scrambled_word_matcher.logger import init_logger
 
 DICTIONARY_SIZE = 100
 MIN_WORD_LENGTH = 2
@@ -19,6 +20,8 @@ MAX_LINES = 100
 MAX_LINE_LENGTH = 500
 
 REPEAT_COUNT = 10
+
+BENCHMARK_LOGGER = init_logger('benchmark')
 
 
 def calculate_percentile(data: List[float], percentile: float) -> float:
@@ -53,7 +56,7 @@ def generate_input_file() -> str:
 
 
 def setup_matcher(dictionary_file: str) -> ScrambledWordMatcher:
-    matcher = ScrambledWordMatcher()
+    matcher = ScrambledWordMatcher(BENCHMARK_LOGGER)
     with open(dictionary_file) as f:
         for word in f:
             matcher.add_word(word.strip())

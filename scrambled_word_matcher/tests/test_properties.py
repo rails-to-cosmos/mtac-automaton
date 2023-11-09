@@ -5,7 +5,9 @@ from typing import Tuple, List
 from hypothesis import given, strategies as st
 
 from scrambled_word_matcher import ScrambledWordMatcher
+from scrambled_word_matcher.logger import init_logger
 
+TEST_LOGGER = init_logger('test.property')
 
 @st.composite
 def arbitrary_scramblings(draw) -> Tuple[str, str]:
@@ -28,21 +30,21 @@ class TestScrambledWordMatcher(unittest.TestCase):
 
     @given(unique_words_list())
     def test_detection_of_dictionary_words(self, dictionary: List[str]) -> None:
-        matcher = ScrambledWordMatcher()
+        matcher = ScrambledWordMatcher(TEST_LOGGER)
         for word in dictionary:
             matcher.add_word(word)
         self.assertEqual(matcher.scan(''.join(dictionary)), len(dictionary))
 
     @given(random_words())
     def test_no_duplicates_counted(self, word: str) -> None:
-        matcher = ScrambledWordMatcher()
+        matcher = ScrambledWordMatcher(TEST_LOGGER)
         matcher.add_word(word)
         repeated = ' '.join([word] * 5)
         self.assertEqual(matcher.scan(repeated), 1)
 
     @given(unique_words_list(), st.text(min_size=100, max_size=100, alphabet=string.ascii_lowercase))
     def test_dictionary_words_in_a_long_text(self, dictionary: List[str], long_text: str) -> None:
-        matcher = ScrambledWordMatcher()
+        matcher = ScrambledWordMatcher(TEST_LOGGER)
         for word in dictionary:
             matcher.add_word(word)
 
@@ -51,14 +53,14 @@ class TestScrambledWordMatcher(unittest.TestCase):
     @given(arbitrary_scramblings())
     def test_arbitrary_scrambled_word_matching(self, word_and_scrambling: Tuple[str, str]) -> None:
         word, scrambling = word_and_scrambling
-        matcher = ScrambledWordMatcher()
+        matcher = ScrambledWordMatcher(TEST_LOGGER)
         matcher.add_word(word)
         self.assertEqual(matcher.scan(scrambling), 1)
 
     @given(st.sets(random_words(), max_size=100))
     def test_unique_word_matches(self, words: set) -> None:
         text = ''.join(words)
-        matcher = ScrambledWordMatcher()
+        matcher = ScrambledWordMatcher(TEST_LOGGER)
         for word in words:
             matcher.add_word(word)
         matches = matcher.scan(text)
