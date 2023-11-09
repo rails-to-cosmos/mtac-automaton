@@ -4,11 +4,11 @@ from functools import cache
 from collections import defaultdict
 from typing import Tuple, Dict, Set, List
 
-from scrambled_word_matcher.validations import validate_dictionary
-from scrambled_word_matcher.validations import validate_input_file
-from scrambled_word_matcher.validations import validate_char
+from scrambled_word_matcher.constraints import validate_dictionary
+from scrambled_word_matcher.constraints import validate_input_file
+from scrambled_word_matcher.constraints import validate_char
 
-from scrambled_word_matcher.validations import ALPHABET_SIZE
+from scrambled_word_matcher.constraints import ALPHABET_SIZE
 
 CharCountTable = Tuple[int, ...]  # Tuple of ALPHABET_SIZE items
 

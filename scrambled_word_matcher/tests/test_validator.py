@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, mock_open
 
-from scrambled_word_matcher.validations import validate_dictionary, validate_input_file
+from scrambled_word_matcher.constraints import validate_dictionary, validate_input_file
 
 
 class TestScrambledWordMatcher(unittest.TestCase):

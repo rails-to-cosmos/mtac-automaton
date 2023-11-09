@@ -29,10 +29,18 @@ pipenv install --dev
 
 ## Running the Tests
 
-To run the tests, execute the following command from the root directory of the project:
+To run the tests (I provided some unit tests, doc tests and property tests), execute the following command from the root directory of the project:
 
 ```bash
 ./test.sh
+```
+
+## Running the Benchmarks
+
+To run the benchmarks, execute the following command:
+
+```bash
+./benchmark.sh
 ```
 
 ## Running the Command
