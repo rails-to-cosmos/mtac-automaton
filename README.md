@@ -99,14 +99,14 @@ The `ScrambledWordMatcher` is designed to efficiently match words from a diction
 
 ### Time Complexity
 
-The time complexity of the `add_word` method is O(N log N), where N is the length of the word being added. This is due to the sorting operation on the scrambled portion of the word.
+The time complexity of the `add_word` method is `O(N log N)`, where `N` is the length of the word being added. This is due to the sorting operation on the scrambled portion of the word.
 
-The `scan` method has a more complex time complexity. For each position in the text, it checks possible matches for all dictionary words, resulting in a complexity of O(M * W * L log L), where:
-- M is the length of the text to be scanned.
-- W is the number of words in the dictionary.
-- L is the average length of the words in the dictionary.
+The `scan` method has a more complex time complexity. For each position in the text, it checks possible matches for all dictionary words, resulting in a complexity of `O(M * W * L log L)`, where:
+- `M` is the length of the text to be scanned.
+- `W` is the number of words in the dictionary.
+- `L` is the average length of the words in the dictionary.
 
-This complexity arises because for each character in the text, the algorithm generates substrings of lengths that match the word lengths in the dictionary and sorts each substring (L log L). It then checks these against the possible scrambled forms in the dictionary (W).
+This complexity arises because for each character in the text, the algorithm generates substrings of lengths that match the word lengths in the dictionary and sorts each substring (`L log L`). It then checks these against the possible scrambled forms in the dictionary (`W`).
 
 ### Memory Complexity
 
