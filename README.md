@@ -89,54 +89,44 @@ Please ensure that you have the `dictionary.txt` and `input.txt` files in the `.
 - You may need to use absolute paths depending on your Docker setup and operating system.
 - Ensure Docker has permissions to access the directories/files you're trying to mount.
 
-## Design Concepts
+## Algorithmic Overview
 
-The matcher uses a sorting approach to identify scrambled words that match dictionary entries. Optimization efforts focus on minimizing the complexity of sorting operations and early termination of the search when possible.
+The ScrambledWordMatcher utilizes a counting sort approach for the inner characters of words to identify matches in a given text, optimizing search operations and leveraging caching for efficient lookups.
 
-## Algorithmic Complexity Analysis
+## Complexity Analysis
 
 The `ScrambledWordMatcher` is designed to efficiently match words from a dictionary in any scrambled form within a given text, with the constraint that the first and last letters of the word remain in place. Below is the analysis of time and memory complexities of the underlying algorithms:
 
 ### Time Complexity
 
-The time complexity of the `add_word` method is `O(N log N)`, where `N` is the length of the word being added. This is due to the sorting operation on the scrambled portion of the word.
+- `add_word`: O(L) for a word of length L, due to the counting sort approach for character frequencies.
 
-The `scan` method has a more complex time complexity. For each position in the text, it checks possible matches for all dictionary words, resulting in a complexity of `O(M * W * L log L)`, where:
-- `M` is the length of the text to be scanned.
-- `W` is the number of words in the dictionary.
-- `L` is the average length of the words in the dictionary.
-
-This complexity arises because for each character in the text, the algorithm generates substrings of lengths that match the word lengths in the dictionary and sorts each substring (`L log L`). It then checks these against the possible scrambled forms in the dictionary (`W`).
+- `scan`: O(M * D * L) approximately, where M is the length of the text, D is the density of potential matches, and L is the maximum word length. Actual complexity may vary with early termination and the sparsity of matches.
 
 ### Memory Complexity
 
-The memory complexity is mainly dictated by the data structures used to store the dictionary words and their scrambled forms.
+Memory usage is primarily due to the storage of sorted character counts:
 
-- The `index` dictionary has a key for each unique starting and ending character pair and stores another dictionary whose keys are the sorted middle characters of the words. This means the memory usage will be `O(U + S)`, where `U` is the number of unique character pairs, and `S` is the total number of all sorted middle characters from all words.
-- The `word_lengths` set stores the lengths of the words, which at most can be the maximum word length permitted, hence `O(L_max)`, where L_max is the maximum word length (which equals `20` in our case).
-- The `seen` set in the `scan` method can grow to be as large as the number of unique words in the dictionary in the worst case (equals `100` words), so its memory complexity is `O(W)`.
+- Dictionary Storage: O(W * L), where W is the number of words and L is the average word length.
+
+- Sliding Window: O(L), with a single sliding window traversing the text.
 
 ### Parallel Execution Consideration
 
-Parallelizing the `add_word` and `scan` methods would not change the overall time complexity but can greatly reduce the actual time taken to process large dictionaries and texts by making use of multiple CPU cores.
+The design facilitates potential parallel processing, which could significantly improve the efficiency of both operations, depending on the dataset size and system capabilities.
 
-Memory complexity in a parallelized context could increase due to additional structures needed for synchronization and potential duplication of data across threads or processes. The specific increase would depend on the implementation details of the parallelization method used.
+### Enhancements
 
-## Additional Information
+Future updates might include:
 
-- The current implementation is optimized for ASCII lowercase input.
+- Adaptation for case-insensitive and Unicode support.
 
-- Future enhancements could include:
-  - Performance improvements for larger datasets or even infinite stream of inputs, such as:
-    - Using [multi-track permuted matching automaton](https://www.mdpi.com/1999-4893/12/4/73) matching algorithms applied to the current problem definition. The hard part is to implement failure links efficiently for permuted matches and add support for dictionary words of different lengths.
-    - Parallel processing:
-      - `add_word` method can be parallelized by dividing the dictionary into chunks and processing each chunk in a separate thread or process. Since writing to the ScrambledWordMatcher.index involves shared state, we would need to synchronize access to this shared resource to prevent race conditions.
-      - `scan` method of ScrambledWordMatcher doesn't share state. So we can run `scan` method in parallel on different input lines or even partition long input lines to chunks ensuring that the division takes place at word boundaries to avoid splitting words that could be matched.
+- Algorithmic refinements for improved performance with large-scale data.
 
-  - Reimplementation in a more efficient runtime (eg Nim, Go or Scala)
+- Possible reimplementations in more performance-oriented languages (eg Nim, Go, Scala).
 
-  - Support for Unicode characters and case-insensitive matching (actually can be performed with the current implementation as well)
+## Author
 
-## Authors
+- Dmitry Akatov (rails-to-cosmos) - Initial work
 
-    Dmitry Akatov - rails-to-cosmos
+Feel free to use and contribute to the development of this utility.

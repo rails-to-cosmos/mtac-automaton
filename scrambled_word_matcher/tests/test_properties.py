@@ -31,7 +31,7 @@ class TestScrambledWordMatcher(unittest.TestCase):
         matcher = ScrambledWordMatcher()
         for word in dictionary:
             matcher.add_word(word)
-        self.assertEqual(matcher.scan(' '.join(dictionary)), len(dictionary))
+        self.assertEqual(matcher.scan(''.join(dictionary)), len(dictionary))
 
     @given(random_words())
     def test_no_duplicates_counted(self, word: str) -> None:
@@ -40,12 +40,13 @@ class TestScrambledWordMatcher(unittest.TestCase):
         repeated = ' '.join([word] * 5)
         self.assertEqual(matcher.scan(repeated), 1)
 
-    @given(unique_words_list(), st.text(min_size=100, max_size=100))
+    @given(unique_words_list(), st.text(min_size=100, max_size=100, alphabet=string.ascii_lowercase))
     def test_dictionary_words_in_a_long_text(self, dictionary: List[str], long_text: str) -> None:
         matcher = ScrambledWordMatcher()
         for word in dictionary:
             matcher.add_word(word)
-        self.assertGreaterEqual(matcher.scan(long_text + ' ' + ' '.join(dictionary)), len(dictionary))
+
+        self.assertGreaterEqual(matcher.scan(long_text + ''.join(dictionary)), len(dictionary))
 
     @given(arbitrary_scramblings())
     def test_arbitrary_scrambled_word_matching(self, word_and_scrambling: Tuple[str, str]) -> None:
@@ -56,7 +57,7 @@ class TestScrambledWordMatcher(unittest.TestCase):
 
     @given(st.sets(random_words(), max_size=100))
     def test_unique_word_matches(self, words: set) -> None:
-        text = ' '.join(words)
+        text = ''.join(words)
         matcher = ScrambledWordMatcher()
         for word in words:
             matcher.add_word(word)

@@ -1,27 +1,29 @@
+from functools import cache
 from collections import defaultdict
-from typing import Tuple, Dict, Set
+from typing import Tuple, Dict, Set, List
+
+ALPHABET_SIZE = 26
+
+CharCountTable = Tuple[int, ...]  # Tuple of ALPHABET_SIZE items
 
 
-# @dataclass(frozen=True)
-# class CharCount:
-#     counts: Dict[str, int]
+@cache
+def validate_char(char: str) -> None:
+    char_lookup_index = ord(char) - ord('a')
+    if not 0 <= char_lookup_index < ALPHABET_SIZE:
+        raise ValueError('Unexpected symbol: %s', char)
 
-#     def __hash__(self):
-#         # To ensure the hash is the same for the same character counts, we need to create a
-#         # tuple from the sorted items. The sorting is necessary because dictionaries are
-#         # unordered, and we want the hash to be independent of the order of keys.
-#         return hash(tuple(sorted(self.counts.items())))
 
-#     def __eq__(self, other):
-#         # Equality should be based on the actual character counts, not the instance identity.
-#         if not isinstance(other, CharCount):
-#             return NotImplemented
-#         return self.counts == other.counts
+@cache
+def counting_sort_chars(chars: str) -> CharCountTable:
+    count = [0] * ALPHABET_SIZE  # Array of zeros for each letter in the alphabet
+    a_ord = ord('a')
 
-#     @classmethod
-#     def from_text(cls, text: str) -> 'CharCount':
-#         # A class method to create a CharCount from a given string.
-#         return cls(Counter(text))
+    for char in chars:
+        validate_char(char)
+        count[ord(char) - a_ord] += 1
+
+    return tuple(count)
 
 
 class ScrambledWordMatcher:
@@ -37,69 +39,74 @@ class ScrambledWordMatcher:
     """
 
     def __init__(self) -> None:
-        self.index: Dict[Tuple[str, str], Dict[str, int]] = defaultdict(lambda: defaultdict(int))
+        # The inner dict now holds a tuple (counts of letters) instead of a string
+        self.index: Dict[Tuple[str, str], Dict[Tuple, int]] = defaultdict(lambda: defaultdict(int))
         self.word_lengths: Set[int] = set()
         self.word_count: int = 0
 
     def add_word(self, word: str) -> None:
-        """
-        Adds a word to the matcher's dictionary.
-
-        >>> matcher = ScrambledWordMatcher()
-        >>> matcher.add_word('maps')
-        >>> matcher.word_count
-        1
-        """
-
         key = (word[0], word[-1])
-        scramble = ''.join(sorted(word[1:-1]))
+
+        # Use counting sort to create a tuple representing the character counts
+        scramble = counting_sort_chars(word)
         self.index[key][scramble] += 1
         self.word_lengths.add(len(word))
         self.word_count += 1
 
     def scan(self, text: str) -> int:
-        """
-        Scans a given text and counts the number of matched words from the dictionary.
+        matches = 0
+        seen: Set[Tuple[Tuple[str, str], CharCountTable]] = set()
 
-        >>> matcher = ScrambledWordMatcher()
-        >>> matcher.add_word('maps')
-        >>> matcher.add_word('spam')
-        >>> matcher.scan('pamsapms')
-        1
-        """
+        sliding_window_counts = self.init_sliding_windows(text)
 
-        count = 0
+        for left_index, char in enumerate(text):
+            validate_char(char)
 
-        sliding_windows: Dict[int, Dict[str, int]] = {
-            word_length: defaultdict(int)
-            for word_length in self.word_lengths
-        }
+            for word_length in self.word_lengths:
+                right_index = left_index + word_length - 1
 
-        seen: Set[Tuple[Tuple[str, str], str]] = set()
+                if left_index + word_length > len(text):
+                    continue
 
-        for i, char in enumerate(text):
-            for word_length in sorted(self.word_lengths):
+                window_counts = sliding_window_counts[word_length]
+                if left_index > 0:  # Decrement the count for the character that's sliding out of the window
+                    sliding_out_char = text[left_index - 1]
+                    window_counts[ord(sliding_out_char) - ord('a')] -= 1
 
-                if i + word_length > len(text):
-                    break
+                    # Increment the count for the character that's sliding in
+                    if right_index < len(text):
+                        sliding_in_char = text[right_index]
+                        validate_char(sliding_in_char)
+                        window_counts[ord(sliding_in_char) - ord('a')] += 1
 
-                key = (char, text[i + word_length - 1])
+                key = (char, text[right_index])
                 if key not in self.index:
                     continue
 
-                window = sliding_windows[word_length]
-                window[char] += 1
-
-                # In the naive approach, I sort each candidate.
-                # It leads to O(20 * n * log(n)) overall complexity in the worst case.
-                # This could be improved by using hash maps for counting and comparison in future.
-                candidate = ''.join(sorted(text[i + 1: i + word_length - 1]))
-
+                # Create a tuple from the window counts for comparison
+                candidate = tuple(window_counts)
                 if candidate in self.index[key] and (key, candidate) not in seen:
-                    count += self.index[key][candidate]
+                    matches += self.index[key][candidate]
                     seen.add((key, candidate))
 
-                    if len(seen) == self.word_count:  # early exit
-                        return count
+                    if len(seen) == self.word_count:  # Early exit
+                        return matches
 
-        return count
+        return matches
+
+    def init_sliding_windows(self, text: str) -> Dict[int, List[int]]:
+        "Prepares initial state of sliding windows that we will use for scan."
+
+        sliding_window_counts: Dict[int, List[int]] = {word_length: [0] * ALPHABET_SIZE for word_length in self.word_lengths}
+
+        for word_length in self.word_lengths:
+            window_counts = sliding_window_counts[word_length]
+
+            i = 0
+            while i < min(word_length, len(text)):
+                char = text[i]
+                validate_char(char)
+                window_counts[ord(char) - ord('a')] += 1
+                i += 1
+
+        return sliding_window_counts

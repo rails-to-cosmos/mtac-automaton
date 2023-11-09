@@ -44,6 +44,13 @@ class TestScrambledWordMatcher(unittest.TestCase):
         matcher.add_word('part')
         self.assertEqual(matcher.scan('wtsartsatroplopratlopostar'), 2)
 
+    def test_simple_long(self):
+        matcher = ScrambledWordMatcher()
+        matcher.add_word('aaaaaaaa')
+        matcher.add_word('ab')
+        long_text = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab'
+        self.assertEqual(matcher.scan(long_text), 2)
+
     def test_multi_scan(self):
         matcher = ScrambledWordMatcher()
         matcher.add_word('axpaj')

@@ -20,9 +20,11 @@ MAX_LINE_LENGTH = 500
 
 REPEAT_COUNT = 10
 
+
 def calculate_percentile(data: List[float], percentile: float) -> float:
     size = len(data)
     return sorted(data)[int(size * percentile / 100)]
+
 
 def generate_dictionary_file() -> str:
     words: Set[str] = set()
@@ -33,9 +35,10 @@ def generate_dictionary_file() -> str:
 
     with closing(tempfile.NamedTemporaryFile(mode='w', delete=False)) as temp_file:
         for word in words:
-            temp_file.write(word + '\n')
+            temp_file.write(word)
 
     return temp_file.name
+
 
 def generate_input_file() -> str:
     lines = random.randint(1, MAX_LINES)
@@ -44,9 +47,10 @@ def generate_input_file() -> str:
         for _ in range(lines):
             line_length = random.randint(MIN_WORD_LENGTH, MAX_LINE_LENGTH)
             line = ''.join(random.choices(string.ascii_lowercase, k=line_length))
-            temp_file.write(line + '\n')
+            temp_file.write(line)
 
     return temp_file.name
+
 
 def setup_matcher(dictionary_file: str) -> ScrambledWordMatcher:
     matcher = ScrambledWordMatcher()
@@ -54,6 +58,7 @@ def setup_matcher(dictionary_file: str) -> ScrambledWordMatcher:
         for word in f:
             matcher.add_word(word.strip())
     return matcher
+
 
 def run_benchmark(dictionary_file: str, input_file: str) -> Tuple[float, float, float, float, float]:
     matcher = setup_matcher(dictionary_file)
