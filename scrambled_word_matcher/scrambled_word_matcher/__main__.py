@@ -13,19 +13,21 @@ def main(dictionary_path: str, input_path: str) -> None:
     matcher = ScrambledWordMatcher(logger)
 
     try:
-        matcher.add_dictionary(dictionary_path)
+        matcher.import_dictionary(dictionary_path)
     except DictionaryValidationError as exc:
         logger.error('Dictionary validation failed:')
         logger.error(str(exc))
         sys.exit(1)
 
     try:
-        matcher.scan_file(input_path)
+        result = matcher.scan_file(input_path)
     except InputValidationError as exc:
         logger.error('Input validation failed:')
         logger.error(str(exc))
         sys.exit(1)
 
+    for case_number, matches in enumerate(result, start=1):
+        print(f'Case #{case_number}: {matches}')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Scrambled String Matcher CLI')

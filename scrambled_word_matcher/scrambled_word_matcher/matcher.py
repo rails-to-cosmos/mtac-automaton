@@ -1,5 +1,6 @@
 import logging
 
+from contextlib import closing
 from functools import cache
 from collections import defaultdict
 from typing import Tuple, Dict, Set, List
@@ -53,6 +54,7 @@ def counting_sort_chars(chars: str) -> CharCountTable:
 
     return tuple(count)
 
+
 class ScrambledWordMatcher:
     """
     A class that matches words from a dictionary in any scrambled form within a given text.
@@ -67,13 +69,37 @@ class ScrambledWordMatcher:
     """
 
     def __init__(self, logger: logging.Logger) -> None:
-        # The inner dict now holds a tuple (counts of letters) instead of a string
+        """
+        Initialize the ScrambledWordMatcher with a logger.
+
+        The matcher maintains an index for fast lookups, a set of word lengths to optimize scanning,
+        and a count of words added to the dictionary. The logger is used for debugging and information output.
+
+        :param logger: A logging.Logger instance for logging messages.
+
+        Properties:
+        - index: A default dictionary to store the occurrence count of words with the same first and last letter.
+                 The keys are tuples of the form (first_letter, last_letter), and the values are dictionaries
+                 where keys are tuples representing the sorted character counts of the word,
+                 and values are the counts of how many times these character counts occur.
+        - word_lengths: A set that stores the lengths of all unique words added to the matcher.
+                        This is used to optimize the scanning process.
+        - word_count: An integer count of the total number of unique words added to the matcher.
+                      This is used for early exit.
+        - logger: The logging.Logger instance passed during initialization for logging.
+
+        Usage:
+        >>> import logging
+        >>> logger = logging.getLogger('test_logger')
+        >>> matcher = ScrambledWordMatcher(logger)
+        """
+
         self.index: Dict[Tuple[str, str], Dict[Tuple, int]] = defaultdict(lambda: defaultdict(int))
         self.word_lengths: Set[int] = set()
         self.word_count: int = 0
         self.logger = logger
 
-    def add_dictionary(self, dictionary_path: str) -> None:
+    def import_dictionary(self, dictionary_path: str) -> None:
         validate_dictionary(dictionary_path)
 
         with open(dictionary_path, 'r', encoding='utf-8') as dictionary_file:
@@ -81,35 +107,104 @@ class ScrambledWordMatcher:
                 self.add_word(line.strip())
 
     def add_word(self, word: str) -> None:
-        # Use counting sort to create a tuple representing the character counts internally.
+        """
+        Adds a word to the matcher's dictionary for later matching.
+
+        This method updates the matcher's index with the character count signature
+        of the word's middle characters (excluding the first and last character).
+        It also updates the set of word lengths and the total word count.
+
+        The word is expected to only contain lowercase English letters (a-z),
+        and it must be at least 2 characters long.
+
+        :param word: The word to be added to the dictionary. It is assumed
+                     that 'word' has already been validated for length and character set.
+
+        Usage:
+        >>> matcher = ScrambledWordMatcher(logging.getLogger('test'))
+        >>> matcher.add_word('apple')
+        >>> matcher.word_count
+        1
+        >>> matcher.index[('a', 'e')][tuple(counting_sort_chars('apple'))]
+        1
+        >>> matcher.add_word('apply')
+        >>> matcher.word_count
+        2
+        >>> matcher.index[('a', 'y')][tuple(counting_sort_chars('apply'))]
+        1
+        >>> 'apple' in matcher.index[('a', 'e')]
+        False
+        """
+
         key = (word[0], word[-1])
         scramble = counting_sort_chars(word)
+
         self.index[key][scramble] += 1
         self.word_lengths.add(len(word))
         self.word_count += 1
 
-    def scan_file(self, input_path: str) -> None:
+    def scan_file(self, input_path: str) -> List[int]:
+        """
+        Reads the input file line by line, scans each line for matches against the
+        dictionary, and returns a list of match counts for each line.
+
+        Before scanning, the input file is validated to ensure it meets the required
+        criteria (e.g., line count, line length).
+
+        :param input_path: The file system path to the input file to be scanned.
+        :return: A list of integers where each integer is the number of matches
+                 found in the corresponding line of the input file.
+        """
+
         validate_input_file(input_path)
 
-        with open(input_path, 'r', encoding='utf-8') as input_file:
-            for case_number, line in enumerate(input_file, start=1):
-                matches = self.scan(line.strip())
-                print(f'Case #{case_number}: {matches}')
+        input_lines = []
+
+        with closing(open(input_path, 'r', encoding='utf-8')) as input_file:
+            for input_line in input_file:
+                input_lines.append(input_line)
+
+        result = []
+
+        for line in input_lines:
+            matches = self.scan(line.strip())
+            result.append(matches)
+
+        return result
 
     def scan(self, text: str) -> int:
+        """
+        Scan the given text and count the number of dictionary word occurrences.
+
+        The method implements a sliding window to count occurrences of each character in the window,
+        compares the count against the stored dictionary counts, and returns count of matches.
+
+        It also ensures that each dictionary word is only counted once per text scan.
+
+        :param text: The string of text to be scanned for dictionary word occurrences.
+        :return: The total count of dictionary word matches found in the text.
+
+        Usage:
+        >>> matcher = ScrambledWordMatcher(logging.getLogger('test'))
+        >>> matcher.add_word('hello')
+        >>> matcher.add_word('world')
+        >>> matcher.scan('ehllodlrowhelloworld')
+        2
+        """
+
         matches = 0
         seen: Set[Tuple[Tuple[str, str], CharCountTable]] = set()
 
         sliding_window_counts = self.init_sliding_windows(text)
 
-        for left_index, char in enumerate(text):
-            validate_char(char)
+        for left_index, left_char in enumerate(text):
+            validate_char(left_char)
 
             for word_length in self.word_lengths:
                 right_index = left_index + word_length - 1
 
                 if left_index + word_length > len(text):
-                    continue
+                    continue  # We could even break if self.word_lengths is sorted
 
                 window_counts = sliding_window_counts[word_length]
                 if left_index > 0:  # Decrement the count for the character that's sliding out of the window
@@ -122,7 +217,8 @@ class ScrambledWordMatcher:
                         validate_char(sliding_in_char)
                         window_counts[ord(sliding_in_char) - ord('a')] += 1
 
-                key = (char, text[right_index])
+                right_char = text[right_index]
+                key = (left_char, right_char)
                 if key not in self.index:
                     continue
 
@@ -138,7 +234,27 @@ class ScrambledWordMatcher:
         return matches
 
     def init_sliding_windows(self, text: str) -> Dict[int, List[int]]:
-        "Prepares initial state of sliding windows that we will use for scan."
+        """
+        Initializes sliding windows for distinct character counts in the given text.
+
+        This method prepares a dictionary with keys as word lengths and values as lists.
+        Each list represents the count of each letter in the alphabet within the sliding
+        window at the beginning of the text.
+
+        :param text: The text for which the sliding windows are to be initialized.
+        :return: A dictionary mapping word lengths to character count lists.
+
+        Usage:
+        >>> matcher = ScrambledWordMatcher(logging.getLogger('test'))
+        >>> matcher.word_lengths = {3, 4, 5}  # Assume these lengths are in the dictionary
+        >>> sliding_windows = matcher.init_sliding_windows('hello')
+        >>> sliding_windows[3]
+        [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        >>> sliding_windows[4]
+        [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        >>> sliding_windows[5]
+        [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 2, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        """
 
         sliding_window_counts: Dict[int, List[int]] = {word_length: [0] * ALPHABET_SIZE for word_length in self.word_lengths}
 
