@@ -9,6 +9,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 - [devenv](https://devenv.sh) and [direnv](https://direnv.net) for container-less isolated environment.
+- *[Optional]* If you don't like the Nix approach, you can install [Python 3.11](https://www.python.org/downloads/release/python-3110/) via [pyenv](https://github.com/pyenv/pyenv), [pip](https://pypi.org/project/pip/) and [pipenv](https://pipenv.pypa.io/en/latest/).
 - *[Optional]* [Docker](https://www.docker.com) or similar tool like [Lima](https://github.com/lima-vm/lima), [Podman](https://podman.io) or [Kaniko](https://github.com/GoogleContainerTools/kaniko) for the container management.
 
 ### Installation
@@ -18,16 +19,16 @@ Clone the repository to your local machine:
 ```bash
 git clone https://github.com/rails-to-cosmos/scrambled-word-matcher.git
 cd scrambled-word-matcher
-```
+ ```
 
 Install the required dependencies in isolated environment associated with the current directory:
 
 ```bash
-direnv allow
+direnv allow  # in case you have devenv and direnv installed
 pipenv install --dev
 ```
 
-## Running the Tests
+### Running the Tests
 
 To run the tests (I provided some unit tests, doc tests and property tests), execute the following command from the root directory of the project:
 
@@ -35,7 +36,7 @@ To run the tests (I provided some unit tests, doc tests and property tests), exe
 ./test.sh
 ```
 
-## Running the Benchmarks
+### Running the Benchmarks
 
 To run the benchmarks, execute the following command:
 
@@ -43,7 +44,7 @@ To run the benchmarks, execute the following command:
 ./benchmark.sh
 ```
 
-## Running the Command
+### Running the Matcher
 
 To use Scrambled Word Matcher, you need to provide a dictionary file and an input file. I prepared sample data for you in a `sample` directory. Run the command as follows:
 
