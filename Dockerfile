@@ -19,4 +19,4 @@ RUN devenv shell pipenv install --dev
 
 ADD . .
 
-ENTRYPOINT ["devenv", "shell", "bash", "scrambled-strings"]
+ENTRYPOINT ["bash", "entrypoint.sh"]
