@@ -1,12 +1,15 @@
+import sys
 import logging
 
+from operator import itemgetter
 from contextlib import closing
 from functools import cache
-from collections import defaultdict
+from collections import defaultdict, Counter
 from typing import Tuple, Dict, Set, List
 
-from concurrent.futures import ThreadPoolExecutor
 import threading
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import as_completed
 
 from scrambled_word_matcher.constraints import validate_dictionary
 from scrambled_word_matcher.constraints import validate_input_file
@@ -97,7 +100,7 @@ class ScrambledWordMatcher:
         >>> matcher = ScrambledWordMatcher(logger)
         """
 
-        self.index: Dict[Tuple[str, str], Dict[Tuple, int]] = defaultdict(lambda: defaultdict(int))
+        self.index: Dict[Tuple[str, str], Dict[Tuple, int]] = defaultdict(Counter)
         self.word_lengths: Set[int] = set()
         self.word_count: int = 0
         self.logger = logger
@@ -174,15 +177,9 @@ class ScrambledWordMatcher:
 
         with closing(open(input_path, 'r', encoding='utf-8')) as input_file:
             for input_line in input_file:
-                input_lines.append(input_line)
+                input_lines.append(input_line.strip())
 
-        result = []
-
-        for line in input_lines:
-            matches = self.scan(line.strip())
-            result.append(matches)
-
-        return result
+        return self.scan_lines(input_lines)
 
     def scan(self, text: str) -> int:
         """
@@ -244,6 +241,41 @@ class ScrambledWordMatcher:
                         return matches
 
         return matches
+
+
+    def scan_line(self, line_number_and_text: Tuple[int, str]) -> Tuple[int, int]:
+        """
+        Scan a single line of text and return the line number and count of matched words.
+
+        :param line_number_and_text: A tuple containing the line number and the text to scan.
+        :return: A tuple of the line number and the number of matches found.
+        """
+        line_number, text = line_number_and_text
+        return line_number, self.scan(text)
+
+
+    def scan_lines(self, lines: List[str]) -> List[int]:
+        """
+        Scan a list of lines in parallel, returning a list of tuples with line numbers and match counts.
+
+        :param lines: A list of text lines to scan.
+        :return: A list of tuples, each containing a line number and the count of matches for that line.
+        """
+        # Tuple of line number and line text
+        numbered_lines = list(enumerate(lines, start=1))
+
+        results = []
+        with ThreadPoolExecutor() as executor:
+            # Start the load operations and mark each future with its line number
+            future_to_line = {executor.submit(self.scan_line, line): line for line in numbered_lines}
+            for future in as_completed(future_to_line):
+                line = future_to_line[future]
+                line_number, count = future.result()
+                results.append((line_number, count))
+
+        # Sort the results by line number to maintain original order
+        return [matches for line_number, matches in sorted(results, key=itemgetter(0))]
+
 
     def init_sliding_windows(self, text: str) -> Dict[int, List[int]]:
         """
