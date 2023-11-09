@@ -25,8 +25,42 @@ BENCHMARK_LOGGER = init_logger('benchmark')
 
 
 def calculate_percentile(data: List[float], percentile: float) -> float:
+    """
+    Calculate the given percentile of a list of numbers.
+
+    :param data: A list of floating-point numbers.
+    :param percentile: The percentile to calculate (a float between 0 and 100).
+    :return: The percentile value from the data.
+
+    Examples:
+    >>> calculate_percentile([10, 20, 30, 40, 50], 25)
+    20.0
+    >>> calculate_percentile([1, 2, 3, 4, 5], 50)
+    3.0
+    >>> calculate_percentile([1, 3, 5, 7, 9], 80)
+    7.2
+    >>> calculate_percentile([1.5, 3.5, 4.5, 6.5], 75)
+    5.25
+    """
+
+    if not data:
+        raise ValueError("Data list cannot be empty.")
+
+    if not 0 <= percentile <= 100:
+        raise ValueError("Percentile must be between 0 and 100.")
+
     size = len(data)
-    return sorted(data)[int(size * percentile / 100)]
+    if size == 1:
+        return data[0]
+
+    # When the percentile does not fall exactly on an index, interpolate between the two surrounding data points.
+    index = (size * percentile / 100)
+    prev_index = int(index)
+    next_index = min(prev_index + 1, size - 1)
+    interpolation = index - prev_index
+
+    sorted_data = sorted(data)
+    return sorted_data[prev_index] * (1 - interpolation) + sorted_data[next_index] * interpolation
 
 
 def generate_dictionary_file() -> str:
