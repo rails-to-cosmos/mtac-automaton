@@ -114,7 +114,7 @@ The memory complexity is mainly dictated by the data structures used to store th
 
 - The `index` dictionary has a key for each unique starting and ending character pair and stores another dictionary whose keys are the sorted middle characters of the words. This means the memory usage will be `O(U + S)`, where `U` is the number of unique character pairs, and `S` is the total number of all sorted middle characters from all words.
 - The `word_lengths` set stores the lengths of the words, which at most can be the maximum word length permitted, hence `O(L_max)`, where L_max is the maximum word length (which equals `20` in our case).
-- The `seen` set in the `scan` method can grow to be as large as the number of unique words in the dictionary in the worst case (equals `100` words), so its memory complexity is O(W).
+- The `seen` set in the `scan` method can grow to be as large as the number of unique words in the dictionary in the worst case (equals `100` words), so its memory complexity is `O(W)`.
 
 ### Parallel Execution Consideration
 
