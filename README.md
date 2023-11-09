@@ -107,7 +107,7 @@ Memory usage is primarily due to the storage of sorted character counts:
 
 ### Parallel Execution Consideration
 
-The design facilitates potential parallel processing, which could significantly improve the efficiency of both operations, depending on the dataset size and system capabilities.
+The design facilitates parallel processing, which improves the efficiency of both operations (adding words and scan), depending on the dataset size and system capabilities. In `scan_lines` I use ThreadPoolExecutor for the sake of simplicity (Matcher has some non-serializable fields). Potentially ThreadPoolExecutor could be changed to ProcessPoolExecutor to avoid Python's GIL downsides on CPU-bound processing.
 
 ### Enhancements
 
