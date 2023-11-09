@@ -1,10 +1,9 @@
 import logging
 
-def init_logger(
-        name: str,
-        level: int = logging.DEBUG,
-        fmt: str = '%(asctime)s - %(levelname)s - %(name)s - %(message)s',
-):
+def init_logger(name: str,
+                level: int = logging.DEBUG,
+                fmt: str = '%(asctime)s - %(levelname)s - %(name)s - %(message)s'):
+
     logger = logging.getLogger(name)
     logger.setLevel(level)
 

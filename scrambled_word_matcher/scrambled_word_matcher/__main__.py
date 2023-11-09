@@ -29,6 +29,7 @@ def main(dictionary_path: str, input_path: str) -> None:
     for case_number, matches in enumerate(result, start=1):
         print(f'Case #{case_number}: {matches}')
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Scrambled String Matcher CLI')
     parser.add_argument('--dictionary', type=str, required=True, help='Path to the dictionary file')
