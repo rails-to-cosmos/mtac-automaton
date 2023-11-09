@@ -13,12 +13,11 @@ def main(dictionary_path: str, input_path: str):
 
     with open(dictionary_path, 'r', encoding='utf-8') as dictionary_file:
         for line in dictionary_file:
-            word = line.strip()
-            matcher.add_word(word)
+            matcher.add_word(line.strip())
 
     with open(input_path, 'r', encoding='utf-8') as input_file:
         for case_number, line in enumerate(input_file, start=1):
-            matches = matcher.scan(line)
+            matches = matcher.scan(line.strip())
             print(f'Case #{case_number}: {matches}')
 
 
