@@ -1,4 +1,4 @@
-# ScrambledWordMatcher
+# Scrambled Word Matcher
 
 This is a Python utility that enables permuted pattern matching of words. Given a dictionary, it can find and count instances of the words within an input string, even when the letters in the words are scrambled, provided that the first and last letters of the word remain in place.
 
